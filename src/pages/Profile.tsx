@@ -18,7 +18,8 @@ import {
     Dumbbell,
     Sprout,
     Clock,
-    Filter
+    Filter,
+    Activity
 } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import './Profile.css';

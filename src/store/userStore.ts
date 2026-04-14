@@ -130,6 +130,8 @@ interface UserStore {
     clearChat: () => void;
     addAuditLog: (log: Omit<AuditLog, 'id' | 'timestamp'>) => void;
     setRole: (role: 'User' | 'Doctor' | 'Trainer' | 'Farmer' | 'Delivery') => void;
+    completeWorkout: (workoutId: string) => void;
+    setTraineeData: (data: any[]) => void;
 }
 
 export const useUserStore = create<UserStore>()(
