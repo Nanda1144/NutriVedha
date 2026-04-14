@@ -1,0 +1,243 @@
+export interface FoodItem {
+    name: string;
+    category: 'Herbs' | 'Spices' | 'Fruits' | 'Dairy';
+    image: string;
+    benefit: string;
+    uses: string;
+    nutrition: Record<string, string>;
+    ayurvedicValue: string;
+    prices: Record<string, string>;
+    goodFor: string;
+}
+
+const generatePlaceholderImage = (name: string) =>
+    `https://images.unsplash.com/photo-1540324155974-7523202daa3f?auto=format&fit=crop&q=80&w=600&sig=${encodeURIComponent(name)}`;
+
+export const FOOD_DATABASE: FoodItem[] = [
+    // --- HERBS (30+) ---
+    {
+        name: "Tulsi (Holy Basil)",
+        category: "Herbs",
+        image: "https://images.unsplash.com/photo-1615485500704-a1a90f483161?auto=format&fit=crop&q=80&w=600",
+        benefit: "King of herbs for immunity and stress relief.",
+        uses: "Tea, Juice, Fresh leaves",
+        nutrition: { "Vitamin C": "Low", "Zinc": "Moderate", "Antioxidants": "High" },
+        ayurvedicValue: "Increases Prana. Balances Kapha and Vata.",
+        prices: { amazon: "₹120", bigbasket: "₹90", blinkit: "₹95" },
+        goodFor: "Respiratory issues, Stress, Fever"
+    },
+    {
+        name: "Ashwagandha (Winter Cherry)",
+        category: "Herbs",
+        image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=600",
+        benefit: "Powerful adaptogen for strength and vitality.",
+        uses: "Powder with milk, Capsules",
+        nutrition: { "Iron": "3mg/100g", "Withanolides": "Active Part" },
+        ayurvedicValue: "Building Ojas. Balances Vata.",
+        prices: { amazon: "₹450", bigbasket: "₹420", pharmacy: "₹440" },
+        goodFor: "Anxiety, Sleep, Muscle Strength"
+    },
+    {
+        name: "Brahmi (Bacopa)",
+        category: "Herbs",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=600&sig=brahmi",
+        benefit: "Cognitive enhancer and memory booster.",
+        uses: "Oil, Juice, Powder",
+        nutrition: { "Saponins": "High", "Alkaloids": "Present" },
+        ayurvedicValue: "Medhya Rasayana (Brain tonic).",
+        prices: { amazon: "₹280", bigbasket: "₹250", zepto: "₹260" },
+        goodFor: "Memory, Focus, Mental Fatigue"
+    },
+    // Adding more Herbs to reach 30...
+    { name: "Neem", category: "Herbs", image: generatePlaceholderImage("Neem"), benefit: "Blood purifier", uses: "Paste, Juice", nutrition: { "Vitamin C": "Present" }, ayurvedicValue: "Bitter, Cooling", prices: { amazon: "₹100" }, goodFor: "Skin, Blood" },
+    { name: "Shatavari", category: "Herbs", image: generatePlaceholderImage("Shatavari"), benefit: "Female health tonic", uses: "Powder", nutrition: { "Zinc": "High" }, ayurvedicValue: "Building, Cooling", prices: { amazon: "₹350" }, goodFor: "Hormonal balance" },
+    { name: "Giloy", category: "Herbs", image: generatePlaceholderImage("Giloy"), benefit: "Immunity booster", uses: "Juice, Decoction", nutrition: { "Polysaccharides": "High" }, ayurvedicValue: "Tridoshic", prices: { amazon: "₹150" }, goodFor: "Immunity, Digestion" },
+    { name: "Aloe Vera", category: "Herbs", image: generatePlaceholderImage("Aloe Vera"), benefit: "Skin & Digestion", uses: "Gel, Juice", nutrition: { "Vitamins": "A,C,E" }, ayurvedicValue: "Cooling", prices: { amazon: "₹80" }, goodFor: "Skin, Detox" },
+    { name: "Moringa", category: "Herbs", image: generatePlaceholderImage("Moringa"), benefit: "Superfood multivitamin", uses: "Powder, Pods", nutrition: { "Protein": "High", "Calcium": "Very High" }, ayurvedicValue: "Warming", prices: { amazon: "₹220" }, goodFor: "Joints, Energy" },
+    { name: "Arjuna", category: "Herbs", image: generatePlaceholderImage("Arjuna"), benefit: "Heart health cardiotonic", uses: "Tea, Bark powder", nutrition: { "Coenzyme Q10": "Trace" }, ayurvedicValue: "Heart support", prices: { amazon: "₹180" }, goodFor: "Heart, Blood pressure" },
+    { name: "Bhringraj", category: "Herbs", image: generatePlaceholderImage("Bhringraj"), benefit: "King of hair", uses: "Oil", nutrition: { "Ecliptine": "High" }, ayurvedicValue: "Liver/Hair", prices: { amazon: "₹200" }, goodFor: "Hair fall, Liver" },
+    { name: "Triphala", category: "Herbs", image: generatePlaceholderImage("Triphala"), benefit: "Digestive cleanser", uses: "Powder at night", nutrition: { "Tannins": "High" }, ayurvedicValue: "Tridoshic balancer", prices: { amazon: "₹130" }, goodFor: "Constipation, Vision" },
+    { name: "Punarnava", category: "Herbs", image: generatePlaceholderImage("Punarnava"), benefit: "Kidney rejuvenator", uses: "Decoction", nutrition: { "Potassium": "High" }, ayurvedicValue: "Diuretic", prices: { amazon: "₹190" }, goodFor: "Kidney, Swelling" },
+    { name: "Gokshura", category: "Herbs", image: generatePlaceholderImage("Gokshura"), benefit: "Muscle & Vitality", uses: "Powder", nutrition: { "Steroidal Saponins": "High" }, ayurvedicValue: "Strength", prices: { amazon: "₹310" }, goodFor: "Muscle gain, Urinary health" },
+    { name: "Shankhpushpi", category: "Herbs", image: generatePlaceholderImage("Shankhpushpi"), benefit: "Brain relaxant", uses: "Syrup, Powder", nutrition: { "Alkaloids": "Present" }, ayurvedicValue: "Calming", prices: { amazon: "₹170" }, goodFor: "Stress, Memory" },
+    { name: "Safed Musli", category: "Herbs", image: generatePlaceholderImage("Safed Musli"), benefit: "Natural energy", uses: "Milk powder", nutrition: { "Saponins": "High" }, ayurvedicValue: "Nourishing", prices: { amazon: "₹600" }, goodFor: "Vitality, Strength" },
+    { name: "Kambhoji", category: "Herbs", image: generatePlaceholderImage("Kambhoji"), benefit: "Bone health", uses: "Paste", nutrition: { "Calcium": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹150" }, goodFor: "Bones, Skin" },
+    { name: "Bhumyamalaki", category: "Herbs", image: generatePlaceholderImage("Bhumyamalaki"), benefit: "Liver protector", uses: "Powder", nutrition: { "Phyllanthin": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹140" }, goodFor: "Liver, Jaundice" },
+    { name: "Mandukaparni", category: "Herbs", image: generatePlaceholderImage("Mandukaparni"), benefit: "Skin repair & Brain", uses: "Juice", nutrition: { "Asiatic acid": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹160" }, goodFor: "Skin, Brain" },
+    { name: "Manjistha", category: "Herbs", image: generatePlaceholderImage("Manjistha"), benefit: "Lymph drainer", uses: "Tea", nutrition: { "Glycosides": "High" }, ayurvedicValue: "Blood cooling", prices: { amazon: "₹240" }, goodFor: "Blood, Skin" },
+    { name: "Varuna", category: "Herbs", image: generatePlaceholderImage("Varuna"), benefit: "Stone breaker", uses: "Bark powder", nutrition: { "Triterpenes": "High" }, ayurvedicValue: "Cleansing", prices: { amazon: "₹210" }, goodFor: "Stone, Urinary" },
+    { name: "Bilva (Bael Leaf)", category: "Herbs", image: generatePlaceholderImage("Bilva (Bael Leaf)"), benefit: "Gut health", uses: "Juice", nutrition: { "Pectin": "High" }, ayurvedicValue: "Digestive", prices: { amazon: "₹90" }, goodFor: "Diarrhea, IBS" },
+    { name: "Vacha", category: "Herbs", image: generatePlaceholderImage("Vacha"), benefit: "Speech & Memory", uses: "External/Small dose", nutrition: { "Beta-asarone": "Present" }, ayurvedicValue: "Stimulating", prices: { amazon: "₹280" }, goodFor: "Memory, Voice" },
+    { name: "Vidari Kand", category: "Herbs", image: generatePlaceholderImage("Vidari Kand"), benefit: "Juicy rejuvenator", uses: "Milk", nutrition: { "Isoflavones": "High" }, ayurvedicValue: "Nourishing", prices: { amazon: "₹400" }, goodFor: "Stamina, Strength" },
+    { name: "Nirgundi", category: "Herbs", image: generatePlaceholderImage("Nirgundi"), benefit: "Pain relief", uses: "Oil, Poultice", nutrition: { "Flavonoids": "High" }, ayurvedicValue: "Pain clearing", prices: { amazon: "₹150" }, goodFor: "Joint pain, Muscles" },
+    { name: "Hibiscus (Gudhal)", category: "Herbs", image: generatePlaceholderImage("Hibiscus (Gudhal)"), benefit: "Hair & Heart", uses: "Tea", nutrition: { "Vitamin C": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹110" }, goodFor: "Hair, BP" },
+    { name: "Rosemary", category: "Herbs", image: generatePlaceholderImage("Rosemary"), benefit: "Clarity & Memory", uses: "Tea, Oil", nutrition: { "Rosmarinic acid": "High" }, ayurvedicValue: "Sharpness", prices: { amazon: "₹300" }, goodFor: "Concentration" },
+    { name: "Oregano", category: "Herbs", image: generatePlaceholderImage("Oregano"), benefit: "Immunity & Gut", uses: "Seasoning", nutrition: { "Carvacrol": "High" }, ayurvedicValue: "Warming", prices: { amazon: "₹120" }, goodFor: "Digestion, Flu" },
+    { name: "Thyme", category: "Herbs", image: generatePlaceholderImage("Thyme"), benefit: "Lung support", uses: "Tea", nutrition: { "Thymol": "High" }, ayurvedicValue: "Clearing", prices: { amazon: "₹130" }, goodFor: "Cough, Throat" },
+    { name: "Peppermint", category: "Herbs", image: generatePlaceholderImage("Peppermint"), benefit: "Cooling & Digestion", uses: "Tea", nutrition: { "Menthol": "High" }, ayurvedicValue: "Vata/Pitta", prices: { amazon: "₹100" }, goodFor: "IBS, Bloating" },
+    { name: "Sage", category: "Herbs", image: generatePlaceholderImage("Sage"), benefit: "Mental clarity", uses: "Tea", nutrition: { "Polyphenols": "High" }, ayurvedicValue: "Drying", prices: { amazon: "₹180" }, goodFor: "Memory, Menopause" },
+    { name: "Lavender", category: "Herbs", image: generatePlaceholderImage("Lavender"), benefit: "Calming sleep", uses: "Tea, Smell", nutrition: { "Linalool": "High" }, ayurvedicValue: "Tridoshic", prices: { amazon: "₹250" }, goodFor: "Sleep, Stress" },
+
+    // --- SPICES (30+) ---
+    {
+        name: "Turmeric (Haldi)",
+        category: "Spices",
+        image: "https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&q=80&w=600",
+        benefit: "Ultimate anti-inflammatory spice.",
+        uses: "Curries, Milk, Paste",
+        nutrition: { "Curcumin": "3-5%", "Iron": "40mg/100g" },
+        ayurvedicValue: "Cleanses Blood. Balances Kapha.",
+        prices: { amazon: "₹150", bigbasket: "₹140", zepto: "₹145" },
+        goodFor: "Arthritis, Immunity, Skin"
+    },
+    {
+        name: "Ginger (Adrak)",
+        category: "Spices",
+        image: "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?auto=format&fit=crop&q=80&w=600",
+        benefit: "Digestive fire booster and cold relief.",
+        uses: "Tea, Cooking, Juice",
+        nutrition: { "Gingerol": "High", "Vitamin C": "Low" },
+        ayurvedicValue: "Ignites Agni. Vata/Kapha balancer.",
+        prices: { amazon: "₹40", zepto: "₹45" },
+        goodFor: "Nausea, Digestion, Cold"
+    },
+    // Adding more Spices...
+    { name: "Black Pepper", category: "Spices", image: generatePlaceholderImage("Black Pepper"), benefit: "Metabolism & Bioavailability", uses: "Seasoning", nutrition: { "Piperine": "High" }, ayurvedicValue: "Scraping Toxins", prices: { amazon: "₹120" }, goodFor: "Fat loss, Immunity" },
+    { name: "Cinnamon", category: "Spices", image: generatePlaceholderImage("Cinnamon"), benefit: "Blood sugar control", uses: "Baking, Tea", nutrition: { "Manganese": "High" }, ayurvedicValue: "Sweet/Heating", prices: { amazon: "₹180" }, goodFor: "Diabetes, Weight" },
+    { name: "Cardamom (Elaichi)", category: "Spices", image: generatePlaceholderImage("Cardamom (Elaichi)"), benefit: "Breath & Digestion", uses: "Tea, Sweets", nutrition: { "Zinc": "Moderate" }, ayurvedicValue: "Cooling Digestive", prices: { amazon: "₹400" }, goodFor: "Acidity, Breath" },
+    { name: "Cloves (Laung)", category: "Spices", image: generatePlaceholderImage("Cloves (Laung)"), benefit: "Tooth health", uses: "Tea, Oil", nutrition: { "Eugenol": "Very High" }, ayurvedicValue: "Heating", prices: { amazon: "₹250" }, goodFor: "Toothache, Cough" },
+    { name: "Cumin (Jeera)", category: "Spices", image: generatePlaceholderImage("Cumin (Jeera)"), benefit: "Iron rich digestive", uses: "Cooking", nutrition: { "Iron": "High" }, ayurvedicValue: "Clearing", prices: { amazon: "₹110" }, goodFor: "Digestion, Bloating" },
+    { name: "Coriander Seeds", category: "Spices", image: generatePlaceholderImage("Coriander Seeds"), benefit: "Thyroid & Skin", uses: "Water, Cooking", nutrition: { "Fiber": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹90" }, goodFor: "Thyroid, Acidity" },
+    { name: "Fenugreek (Methi)", category: "Spices", image: generatePlaceholderImage("Fenugreek (Methi)"), benefit: "Hair & Sugar", uses: "Cooking, Soaked", nutrition: { "Protein": "High" }, ayurvedicValue: "Bitter/Heating", prices: { amazon: "₹80" }, goodFor: "Hair growth, Diabetes" },
+    { name: "Fennel (Saunf)", category: "Spices", image: generatePlaceholderImage("Fennel (Saunf)"), benefit: "After-meal relaxant", uses: "Chewing, Tea", nutrition: { "Anethole": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹100" }, goodFor: "IBS, Colic" },
+    { name: "Mustard Seeds", category: "Spices", image: generatePlaceholderImage("Mustard Seeds"), benefit: "Heart & Skin", uses: "Tempering", nutrition: { "Selenium": "High" }, ayurvedicValue: "Piercing", prices: { amazon: "₹70" }, goodFor: "Circulation, Skin" },
+    { name: "Asafoetida (Hing)", category: "Spices", image: generatePlaceholderImage("Asafoetida (Hing)"), benefit: "Gas expeller", uses: "Pinch in cooking", nutrition: { "Resins": "High" }, ayurvedicValue: "Vata clearer", prices: { amazon: "₹300" }, goodFor: "Flatulence, Bloating" },
+    { name: "Nutmeg", category: "Spices", image: generatePlaceholderImage("Nutmeg"), benefit: "Sleep inducer", uses: "Milk pinch", nutrition: { "Myristicin": "High" }, ayurvedicValue: "Calming", prices: { amazon: "₹200" }, goodFor: "Insomnia, Digestion" },
+    { name: "Saffron (Kesar)", category: "Spices", image: generatePlaceholderImage("Saffron (Kesar)"), benefit: "Complexion & Mood", uses: "Milk, Rice", nutrition: { "Crocetin": "Very High" }, ayurvedicValue: "Nourishing", prices: { amazon: "₹500/g" }, goodFor: "Skin glow, Depression" },
+    { name: "Ajwain", category: "Spices", image: generatePlaceholderImage("Ajwain"), benefit: "Immediate stomach relief", uses: "With water", nutrition: { "Thymol": "High" }, ayurvedicValue: "Deep warming", prices: { amazon: "₹60" }, goodFor: "Stomach pain, Gas" },
+    { name: "Star Anise", category: "Spices", image: generatePlaceholderImage("Star Anise"), benefit: "Anti-viral properties", uses: "Pulao, Tea", nutrition: { "Shikimic acid": "High" }, ayurvedicValue: "Spreading", prices: { amazon: "₹180" }, goodFor: "Flu, Digestion" },
+    { name: "Mace (Javitri)", category: "Spices", image: generatePlaceholderImage("Mace (Javitri)"), benefit: "Mental alertness", uses: "Biryani", nutrition: { "Vitamin A": "High" }, ayurvedicValue: "Warming", prices: { amazon: "₹450" }, goodFor: "Focus, Digestion" },
+    { name: "Poppy Seeds", category: "Spices", image: generatePlaceholderImage("Poppy Seeds"), benefit: "Cooling relaxant", uses: "Paste, Sweets", nutrition: { "Calcium": "Very High" }, ayurvedicValue: "Calming", prices: { amazon: "₹300" }, goodFor: "Sleep, Heat" },
+    { name: "Tamarind", category: "Spices", image: generatePlaceholderImage("Tamarind"), benefit: "Digestive sourness", uses: "Paste", nutrition: { "Tartaric acid": "High" }, ayurvedicValue: "Enzymatic", prices: { amazon: "₹80" }, goodFor: "Digestion, Scurvy" },
+    { name: "Bay Leaf", category: "Spices", image: generatePlaceholderImage("Bay Leaf"), benefit: "Sugar metabolism", uses: "Soups, Rice", nutrition: { "Polyphenols": "High" }, ayurvedicValue: "Clearing", prices: { amazon: "₹50" }, goodFor: "Heart, Diabetes" },
+    { name: "Kalonji", category: "Spices", image: generatePlaceholderImage("Kalonji"), benefit: "Cures everything but death", uses: "Seed oil, Baking", nutrition: { "Thymoquinone": "High" }, ayurvedicValue: "Immunity", prices: { amazon: "₹120" }, goodFor: "Immunity, Hair" },
+    { name: "Dry Mango Powder", category: "Spices", image: generatePlaceholderImage("Dry Mango Powder"), benefit: "Vitamin C spike", uses: "Cooking", nutrition: { "Vitamin C": "Moderate" }, ayurvedicValue: "Sourness", prices: { amazon: "₹90" }, goodFor: "Appetite, Digestion" },
+    { name: "Nut Grass (Nagarmotha)", category: "Spices", image: generatePlaceholderImage("Nut Grass (Nagarmotha)"), benefit: "Belly fat & Fever", uses: "Water", nutrition: { "Terpenoids": "High" }, ayurvedicValue: "Bitter", prices: { amazon: "₹150" }, goodFor: "Weight loss, Fever" },
+    { name: "Licorice (Mulethi)", category: "Spices", image: generatePlaceholderImage("Licorice (Mulethi)"), benefit: "Throat & Stomach", uses: "Chewing", nutrition: { "Glycyrrhizin": "High" }, ayurvedicValue: "Sweet/Cooling", prices: { amazon: "₹140" }, goodFor: "Cough, Acidity" },
+    { name: "Red Chili Powder", category: "Spices", image: generatePlaceholderImage("Red Chili Powder"), benefit: "Endorphin release", uses: "Cooking", nutrition: { "Capsaicin": "High" }, ayurvedicValue: "Sharp Heat", prices: { amazon: "₹110" }, goodFor: "Pain relief, Metabolism" },
+    { name: "Garlic Powder", category: "Spices", image: generatePlaceholderImage("Garlic Powder"), benefit: "Heart & BP", uses: "Seasoning", nutrition: { "Allicin": "Present" }, ayurvedicValue: "Aggressive", prices: { amazon: "₹120" }, goodFor: "Cholesterol, BP" },
+    { name: "Onion Powder", category: "Spices", image: generatePlaceholderImage("Onion Powder"), benefit: "Immunity", uses: "Seasoning", nutrition: { "Quercetin": "Moderate" }, ayurvedicValue: "Nourishing", prices: { amazon: "₹130" }, goodFor: "Bone health" },
+    { name: "Sumac", category: "Spices", image: generatePlaceholderImage("Sumac"), benefit: "Antioxidant giant", uses: "Salads", nutrition: { "Polyphenols": "Very High" }, ayurvedicValue: "Cooling Sour", prices: { amazon: "₹350" }, goodFor: "Inflammation" },
+    { name: "Allspice", category: "Spices", image: generatePlaceholderImage("Allspice"), benefit: "Multi-complex healing", uses: "Baking", nutrition: { "Eugenol": "Moderate" }, ayurvedicValue: "Balanced heating", prices: { amazon: "₹280" }, goodFor: "Digestion, Circulation" },
+    { name: "Curry Leaves", category: "Spices", image: generatePlaceholderImage("Curry Leaves"), benefit: "Hair & Iron", uses: "Tempering", nutrition: { "Iron": "High", "Vitamin A": "High" }, ayurvedicValue: "Cooling Digestive", prices: { amazon: "₹20/bunch" }, goodFor: "Anemia, Gray hair" },
+    { name: "White Pepper", category: "Spices", image: generatePlaceholderImage("White Pepper"), benefit: "Eye health", uses: "Soups", nutrition: { "Piperine": "Moderate" }, ayurvedicValue: "Sharp", prices: { amazon: "₹240" }, goodFor: "Vision, Digestion" },
+
+    // --- FRUITS (30+) ---
+    {
+        name: "Amla (Indian Gooseberry)",
+        category: "Fruits",
+        image: "https://images.unsplash.com/photo-1628134707412-23c8a49df5d0?auto=format&fit=crop&q=80&w=600",
+        benefit: "World's best source of Vitamin C.",
+        uses: "Juice, Preserve (Murabba), Raw",
+        nutrition: { "Vitamin C": "600mg/100g", "Tannins": "Stabilize Vit C" },
+        ayurvedicValue: "Tridoshic Rejuvenator (Rasayana).",
+        prices: { amazon: "₹110", bigbasket: "₹85", zepto: "₹90" },
+        goodFor: "Immunity, Hair, Eyes"
+    },
+    {
+        name: "Pomegranate (Anar)",
+        category: "Fruits",
+        image: "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?auto=format&fit=crop&q=80&w=600",
+        benefit: "Heart healthy and blood builder.",
+        uses: "Juice, Seeds for salad",
+        nutrition: { "Potassium": "High", "Vitamin K": "Present" },
+        ayurvedicValue: "Balances Pitta. Heart Tonic.",
+        prices: { bigbasket: "₹200", zepto: "₹210" },
+        goodFor: "Heart, Hemoglobin, Blood Pressure"
+    },
+    // Adding more Fruits...
+    { name: "Mango", category: "Fruits", image: generatePlaceholderImage("Mango"), benefit: "King of fruits for energy", uses: "Fresh", nutrition: { "Vitamin A": "Very High" }, ayurvedicValue: "Nourishing", prices: { amazon: "₹600/doz" }, goodFor: "Skin, Eyes" },
+    { name: "Banana", category: "Fruits", image: generatePlaceholderImage("Banana"), benefit: "Potassium powerhouse", uses: "Fresh", nutrition: { "Potassium": "High" }, ayurvedicValue: "Vata/Pitta Balancer", prices: { amazon: "₹60/doz" }, goodFor: "Energy, Gut" },
+    { name: "Apple", category: "Fruits", image: generatePlaceholderImage("Apple"), benefit: "Fiber & Clarity", uses: "Fresh, Stewed", nutrition: { "Fiber": "High" }, ayurvedicValue: "Kapha/Pitta", prices: { amazon: "₹200/kg" }, goodFor: "Gut, Heart" },
+    { name: "Papaya", category: "Fruits", image: generatePlaceholderImage("Papaya"), benefit: "Digestion enzyme master", uses: "Fresh", nutrition: { "Papain": "High" }, ayurvedicValue: "Cleaning", prices: { amazon: "₹60/kg" }, goodFor: "Digestion, Skin" },
+    { name: "Guava", category: "Fruits", image: generatePlaceholderImage("Guava"), benefit: "Vitamin C & Fiber", uses: "Fresh", nutrition: { "Fiber": "Very High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹80/kg" }, goodFor: "Constipation, Sugar" },
+    { name: "Jamun (Black Plum)", category: "Fruits", image: generatePlaceholderImage("Jamun (Black Plum)"), benefit: "Sugar balancer", uses: "Fresh", nutrition: { "Anthocyanins": "High" }, ayurvedicValue: "Astringent", prices: { amazon: "₹300/kg" }, goodFor: "Diabetes, Blood" },
+    { name: "Sapodilla (Chikoo)", category: "Fruits", image: generatePlaceholderImage("Sapodilla (Chikoo)"), benefit: "Instant energy", uses: "Fresh", nutrition: { "Fructose": "High" }, ayurvedicValue: "Building", prices: { amazon: "₹70/kg" }, goodFor: "Energy, Bones" },
+    { name: "Custard Apple", category: "Fruits", image: generatePlaceholderImage("Custard Apple"), benefit: "Weight gain & Cooling", uses: "Fresh", nutrition: { "Vitamin C": "High" }, ayurvedicValue: "Pitta reducer", prices: { amazon: "₹180/kg" }, goodFor: "Weight, Heat" },
+    { name: "Bael Fruit", category: "Fruits", image: generatePlaceholderImage("Bael Fruit"), benefit: "Ultimate gut healer", uses: "Juice, Powder", nutrition: { "Mucilage": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹100" }, goodFor: "IBS, Gastritis" },
+    { name: "Coconut", category: "Fruits", image: generatePlaceholderImage("Coconut"), benefit: "Hydration & Good Fat", uses: "Water, Meat", nutrition: { "Electrolytes": "Perfect" }, ayurvedicValue: "Cooling pitta", prices: { amazon: "₹40/pc" }, goodFor: "Skin, Hydration" },
+    { name: "Pineapple", category: "Fruits", image: generatePlaceholderImage("Pineapple"), benefit: "Enzymatic healing", uses: "Fresh", nutrition: { "Bromelain": "High" }, ayurvedicValue: "Heating Digestive", prices: { amazon: "₹90/pc" }, goodFor: "Joints, Digestion" },
+    { name: "Grapes", category: "Fruits", image: generatePlaceholderImage("Grapes"), benefit: "Laxative & Rejuvenating", uses: "Fresh, Raisins", nutrition: { "Resveratrol": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹120/kg" }, goodFor: "Eyes, Thirst" },
+    { name: "Watermelon", category: "Fruits", image: generatePlaceholderImage("Watermelon"), benefit: "Summer Hydration", uses: "Juice", nutrition: { "Lycopene": "High" }, ayurvedicValue: "Diuretic", prices: { amazon: "₹40/kg" }, goodFor: "Heat, Urine" },
+    { name: "Fig (Anjeer)", category: "Fruits", image: generatePlaceholderImage("Fig (Anjeer)"), benefit: "Blood & Energy", uses: "Dry, Fresh", nutrition: { "Fiber": "Very High" }, ayurvedicValue: "Building", prices: { amazon: "₹800/kg" }, goodFor: "Anemia, Weakness" },
+    { name: "Date (Khajoor)", category: "Fruits", image: generatePlaceholderImage("Date (Khajoor)"), benefit: "Iron & Strength", uses: "Snack", nutrition: { "Iron": "High", "Sugar": "Natural" }, ayurvedicValue: "Ojas building", prices: { amazon: "₹400/kg" }, goodFor: "Energy, Anemia" },
+    { name: "Apricot", category: "Fruits", image: generatePlaceholderImage("Apricot"), benefit: "Eye & Skin health", uses: "Dry", nutrition: { "Vitamin A": "High" }, ayurvedicValue: "Warming", prices: { amazon: "₹900/kg" }, goodFor: "Eyes, Skin" },
+    { name: "Lemon", category: "Fruits", image: generatePlaceholderImage("Lemon"), benefit: "Alkalizing Vitamin C", uses: "Juice", nutrition: { "Vitamin C": "High" }, ayurvedicValue: "Digestive fire", prices: { amazon: "₹2/pc" }, goodFor: "Detox, Scurvy" },
+    { name: "Sweet Lime (Mosambi)", category: "Fruits", image: generatePlaceholderImage("Sweet Lime (Mosambi)"), benefit: "Safe hydration", uses: "Juice", nutrition: { "Vitamin C": "Moderate" }, ayurvedicValue: "Cooling", prices: { amazon: "₹80/kg" }, goodFor: "Dehydration, Fever" },
+    { name: "Sita Phal", category: "Fruits", image: generatePlaceholderImage("Sita Phal"), benefit: "Cooling tonic", uses: "Fresh", nutrition: { "Copper": "Moderate" }, ayurvedicValue: "Healing", prices: { amazon: "₹180/kg" }, goodFor: "Weakness" },
+    { name: "Kiwi", category: "Fruits", image: generatePlaceholderImage("Kiwi"), benefit: "Platelet booster", uses: "Fresh", nutrition: { "Vitamin C": "Very High" }, ayurvedicValue: "Acidic/Cooling", prices: { amazon: "₹40/pc" }, goodFor: "Dengue, Skin" },
+    { name: "Dragon Fruit", category: "Fruits", image: generatePlaceholderImage("Dragon Fruit"), benefit: "Immunity rich", uses: "Fresh", nutrition: { "Fiber": "High" }, ayurvedicValue: "Cooling", prices: { amazon: "₹120/pc" }, goodFor: "Diabetes, Heart" },
+    { name: "Star Fruit", category: "Fruits", image: generatePlaceholderImage("Star Fruit"), benefit: "Vitamin C burst", uses: "Fresh", nutrition: { "Vitamin C": "High" }, ayurvedicValue: "Sour", prices: { amazon: "₹100/kg" }, goodFor: "Immunity" },
+    { name: "Wood Apple", category: "Fruits", image: generatePlaceholderImage("Wood Apple"), benefit: "Liver & Kidney detox", uses: "Juice", nutrition: { "Fiber": "High" }, ayurvedicValue: "Cleansing", prices: { amazon: "₹60" }, goodFor: "Liver, Gut" },
+    { name: "Plum", category: "Fruits", image: generatePlaceholderImage("Plum"), benefit: "Antioxidant rich", uses: "Fresh, Dry", nutrition: { "Vitamin K": "High" }, ayurvedicValue: "Pitta/Vata", prices: { amazon: "₹300/kg" }, goodFor: "Bones, Heart" },
+    { name: "Peach", category: "Fruits", image: generatePlaceholderImage("Peach"), benefit: "Skin & Weight", uses: "Fresh", nutrition: { "Vitamin A": "Moderate" }, ayurvedicValue: "Cooling", prices: { amazon: "₹250/kg" }, goodFor: "Skin, Digestion" },
+    { name: "Pear", category: "Fruits", image: generatePlaceholderImage("Pear"), benefit: "Gentle fiber", uses: "Fresh", nutrition: { "Fiber": "Water soluble" }, ayurvedicValue: "Vata Balancing", prices: { amazon: "₹180/kg" }, goodFor: "Constipation" },
+    { name: "Blueberry", category: "Fruits", image: generatePlaceholderImage("Blueberry"), benefit: "Brain food", uses: "Fresh", nutrition: { "Antioxidants": "Highest" }, ayurvedicValue: "Rejuvenating", prices: { amazon: "₹400/box" }, goodFor: "Memory, Eyes" },
+    { name: "Raspberry", category: "Fruits", image: generatePlaceholderImage("Raspberry"), benefit: "Metabolic health", uses: "Fresh", nutrition: { "Ketones": "Present" }, ayurvedicValue: "Sharp", prices: { amazon: "₹500/box" }, goodFor: "Weight loss" },
+    { name: "Avocado", category: "Fruits", image: generatePlaceholderImage("Avocado"), benefit: "Healthy fats & Brain", uses: "Salads", nutrition: { "Oleic Acid": "High" }, ayurvedicValue: "Heavy/Grounding", prices: { amazon: "₹150/pc" }, goodFor: "Brain, Skin" },
+    { name: "Lychee", category: "Fruits", image: generatePlaceholderImage("Lychee"), benefit: "Energy surge", uses: "Fresh", nutrition: { "Vitamin C": "Moderate" }, ayurvedicValue: "Warming fruit", prices: { amazon: "₹300/kg" }, goodFor: "Hydration" },
+
+    // --- DAIRY (30+) ---
+    {
+        name: "Pure Cow Ghee",
+        category: "Dairy",
+        image: "https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&q=80&w=600",
+        benefit: "Lubricates joints and sharpens the brain.",
+        uses: "Cooking, Medicine, External massage",
+        nutrition: { "Butyric Acid": "High", "Omega 3": "Present", "Vitamin A/E": "High" },
+        ayurvedicValue: "Best for Vata and Pitta. Increases 'Ojas'.",
+        prices: { amazon: "₹750/L", bigbasket: "₹700", zepto: "₹720" },
+        goodFor: "Joint pain, Memory, Digestion"
+    },
+    {
+        name: "A2 Desi Cow Milk",
+        category: "Dairy",
+        image: "https://images.unsplash.com/photo-1563636619-e910f6f21952?auto=format&fit=crop&q=80&w=600",
+        benefit: "Purest protein source for easy digestion.",
+        uses: "Direct consumption, Shakes",
+        nutrition: { "A2 Protein": "Digestible", "Calcium": "300mg/cup" },
+        ayurvedicValue: "Complete Food. Nourishing.",
+        prices: { local: "₹90/L", bigbasket: "₹110" },
+        goodFor: "Bone health, Growth, Strength"
+    },
+    // Adding more Dairy...
+    { name: "Paneer (Cottage Cheese)", category: "Dairy", image: generatePlaceholderImage("Paneer (Cottage Cheese)"), benefit: "Muscle building protein", uses: "Curry, Grilled", nutrition: { "Protein": "18g/100g" }, ayurvedicValue: "Heavy/Building", prices: { amazon: "₹100/200g" }, goodFor: "Muscle mass" },
+    { name: "Curd (Dahi)", category: "Dairy", image: generatePlaceholderImage("Curd (Dahi)"), benefit: "Probiotic gut support", uses: "Meal side", nutrition: { "Probiotics": "High" }, ayurvedicValue: "Sour/Heating", prices: { amazon: "₹40/500g" }, goodFor: "Gut health" },
+    { name: "Buttermilk (Chaas)", category: "Dairy", image: generatePlaceholderImage("Buttermilk (Chaas)"), benefit: "Ultimate digestive cooler", uses: "Post-lunch", nutrition: { "Lactobacillus": "High" }, ayurvedicValue: "Light/Cooling", prices: { amazon: "₹20/pack" }, goodFor: "Bloating, Heat" },
+    { name: "Khoya (Mawa)", category: "Dairy", image: generatePlaceholderImage("Khoya (Mawa)"), benefit: "High calorie energy", uses: "Sweets", nutrition: { "Fats": "High" }, ayurvedicValue: "Heavy", prices: { amazon: "₹400/kg" }, goodFor: "Underweight" },
+    { name: "Malai (Cream)", category: "Dairy", image: generatePlaceholderImage("Malai (Cream)"), benefit: "Skin nourishment", uses: "Application, Cooking", nutrition: { "Vitamin E": "High" }, ayurvedicValue: "Building", prices: { amazon: "₹60" }, goodFor: "Dry skin" },
+    { name: "Goat Milk", category: "Dairy", image: generatePlaceholderImage("Goat Milk"), benefit: "Fastest digestibility", uses: "Drink", nutrition: { "Medium Chain Triglycerides": "High" }, ayurvedicValue: "Light Tonic", prices: { amazon: "₹120/L" }, goodFor: "Dengue, Weak Gut" },
+    { name: "Whey (Dairy water)", category: "Dairy", image: generatePlaceholderImage("Whey (Dairy water)"), benefit: "Pure muscle fuel", uses: "Pre-workout", nutrition: { "Whey Protein": "100%" }, ayurvedicValue: "Rapid Energy", prices: { amazon: "₹50" }, goodFor: "Muscles" },
+    { name: "Unsalted White Butter", category: "Dairy", image: generatePlaceholderImage("Unsalted White Butter"), benefit: "Lubrication & Memory", uses: "With Paratha", nutrition: { "DHA": "Present" }, ayurvedicValue: "Brain support", prices: { amazon: "₹150" }, goodFor: "Child growth" },
+    { name: "Colostrum (Peeyush)", category: "Dairy", image: generatePlaceholderImage("Colostrum (Peeyush)"), benefit: "Antibody treasure", uses: "Sweets (Bari)", nutrition: { "IgA/IgG": "Extremely High" }, ayurvedicValue: "Divine Rejuvenator", prices: { local: "₹200/L" }, goodFor: "Lifelong Immunity" },
+    { name: "Kulfi base", category: "Dairy", image: generatePlaceholderImage("Kulfi base"), benefit: "Soul cooling", uses: "Frozen", nutrition: { "Carbs": "High" }, ayurvedicValue: "Deep Pitta/Vata Balancer", prices: { local: "₹50" }, goodFor: "Summer heat" },
+    { name: "Makkhan (Hand-churned)", category: "Dairy", image: generatePlaceholderImage("Makkhan (Hand-churned)"), benefit: "Heart soft fats", uses: "Fresh", nutrition: { "Lecithin": "Present" }, ayurvedicValue: "Softening", prices: { local: "₹100" }, goodFor: "Nerves" },
+    { name: "Kefir", category: "Dairy", image: generatePlaceholderImage("Kefir"), benefit: "Super probiotic", uses: "Drink", nutrition: { "Diverse Strains": "High" }, ayurvedicValue: "Sharp Digestive", prices: { amazon: "₹180" }, goodFor: "Chronic Gut Issues" },
+    { name: "Buffalo Milk", category: "Dairy", image: generatePlaceholderImage("Buffalo Milk"), benefit: "Rich in calcium", uses: "Tea, Sweets", nutrition: { "Calcium": "Higher than cow" }, ayurvedicValue: "Heavy/Sleep inducer", prices: { local: "₹70/L" }, goodFor: "Sleep, Bones" },
+    { name: "Ricotta Cheese", category: "Dairy", image: generatePlaceholderImage("Ricotta Cheese"), benefit: "Low fat protein", uses: "Salads", nutrition: { "Protein": "High", "Fat": "Low" }, ayurvedicValue: "Cooling", prices: { amazon: "₹300" }, goodFor: "Weight management" },
+    { name: "Mozzarella", category: "Dairy", image: generatePlaceholderImage("Mozzarella"), benefit: "Calcium source", uses: "Pizza, Salads", nutrition: { "Calcium": "High" }, ayurvedicValue: "Heavy", prices: { amazon: "₹250" }, goodFor: "Bones" },
+    { name: "Camel Milk", category: "Dairy", image: generatePlaceholderImage("Camel Milk"), benefit: "Diabetes friendly", uses: "Direct", nutrition: { "Insulin-like protein": "High" }, ayurvedicValue: "Light/Piercing", prices: { amazon: "₹400/L" }, goodFor: "Diabetes, Autism" },
+    { name: "Sheep Milk", category: "Dairy", image: generatePlaceholderImage("Sheep Milk"), benefit: "Fat soluble vitamins", uses: "Cheese", nutrition: { "Vitamin A/D": "Extremely High" }, ayurvedicValue: "Strengthening", prices: { local: "₹150" }, goodFor: "Skin, Vision" },
+    { name: "Condensed Milk", category: "Dairy", image: generatePlaceholderImage("Condensed Milk"), benefit: "Fast Carbs", uses: "Baking", nutrition: { "Sugar": "High" }, ayurvedicValue: "Vata reducer", prices: { amazon: "₹140" }, goodFor: "Underweight" },
+    { name: "Greek Yogurt", category: "Dairy", image: generatePlaceholderImage("Greek Yogurt"), benefit: "High Protein Probiotic", uses: "Smoothies", nutrition: { "Protein": "2x Curd" }, ayurvedicValue: "Sharp building", prices: { amazon: "₹80" }, goodFor: "Muscle recovery" },
+    { name: "Cheddar Cheese", category: "Dairy", image: generatePlaceholderImage("Cheddar Cheese"), benefit: "Vitamin K2 source", uses: "Snack", nutrition: { "Vitamin K2": "High" }, ayurvedicValue: "Heavy building", prices: { amazon: "₹400" }, goodFor: "Heart vessels" },
+    { name: "Feta Cheese", category: "Dairy", image: generatePlaceholderImage("Feta Cheese"), benefit: "Digestible tangy protein", uses: "Salads", nutrition: { "Probiotics": "Mild" }, ayurvedicValue: "Cooling/Acidic", prices: { amazon: "₹450" }, goodFor: "Appetite" },
+    { name: "Sour Cream", category: "Dairy", image: generatePlaceholderImage("Sour Cream"), benefit: "Digestive fats", uses: "Dips", nutrition: { "Fats": "Moderate" }, ayurvedicValue: "Sour tonic", prices: { amazon: "₹120" }, goodFor: "Taste/Appetite" },
+    { name: "Cottage Cheese (Creamy)", category: "Dairy", image: generatePlaceholderImage("Cottage Cheese (Creamy)"), benefit: "Sustained Protein", uses: "Fresh", nutrition: { "Casein": "High" }, ayurvedicValue: "Building", prices: { amazon: "₹150" }, goodFor: "Night-time protein" },
+    { name: "Mascarpone", category: "Dairy", image: generatePlaceholderImage("Mascarpone"), benefit: "Rich energy", uses: "Tiramisu", nutrition: { "Fats": "Highest" }, ayurvedicValue: "Sweet/Heavy", prices: { local: "₹400" }, goodFor: "Low fire cases" },
+    { name: "Donkey Milk", category: "Dairy", image: generatePlaceholderImage("Donkey Milk"), benefit: "Immune magic", uses: "Rare tonic", nutrition: { "Lysozyme": "Extremely High" }, ayurvedicValue: "Divine Medicine", prices: { local: "₹2000/L" }, goodFor: "Allergies, Skin" },
+    { name: "Flavoured Milk", category: "Dairy", image: generatePlaceholderImage("Flavoured Milk"), benefit: "Kid's nutrition", uses: "Drink", nutrition: { "Fortified": "Often" }, ayurvedicValue: "Building", prices: { local: "₹30" }, goodFor: "Growth" },
+    { name: "Whipped Cream", category: "Dairy", image: generatePlaceholderImage("Whipped Cream"), benefit: "Texture & Energy", uses: "Topping", nutrition: { "Fats": "Aired" }, ayurvedicValue: "Light-Heavy", prices: { amazon: "₹200" }, goodFor: "Mood" },
+    { name: "Lactose-free Milk", category: "Dairy", image: generatePlaceholderImage("Lactose-free Milk"), benefit: "Easy Dairy", uses: "Direct", nutrition: { "Lactase": "Added" }, ayurvedicValue: "Light", prices: { amazon: "₹130/L" }, goodFor: "Lactose Intolerance" },
+    { name: "Parmesan", category: "Dairy", image: generatePlaceholderImage("Parmesan"), benefit: "Old calcium", uses: "Grated", nutrition: { "Calcium": "Concentrated" }, ayurvedicValue: "Dry/Heavy", prices: { amazon: "₹900" }, goodFor: "Bones" }
+];
