@@ -1,0 +1,38 @@
+{
+  "name": "nutrivedha-server",
+  "version": "1.0.0",
+  "description": "NutriVedha (AyurAI Health) backend - modular microservices",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "workspaces": [
+    "shared",
+    "gateway",
+    "services/*"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev:gateway": "npm run dev -w gateway",
+    "dev:auth": "npm run dev -w @nutrivedha/auth",
+    "dev:user": "npm run dev -w @nutrivedha/user",
+    "dev:ai": "npm run dev -w @nutrivedha/ai",
+    "dev:medical": "npm run dev -w @nutrivedha/medical",
+    "dev:telemedicine": "npm run dev -w @nutrivedha/telemedicine",
+    "dev:marketplace": "npm run dev -w @nutrivedha/marketplace",
+    "dev:delivery": "npm run dev -w @nutrivedha/delivery",
+    "dev:fitness": "npm run dev -w @nutrivedha/fitness",
+    "dev:doctor": "npm run dev -w @nutrivedha/doctor",
+    "dev:farmer": "npm run dev -w @nutrivedha/farmer",
+    "dev:notification": "npm run dev -w @nutrivedha/notification",
+    "dev:analytics": "npm run dev -w @nutrivedha/analytics",
+    "dev:all": "concurrently -k -n gateway,auth,user,ai,medical,tele,market,deliver,fitness,doctor,farmer,notify,analytics -c blue,green,yellow,magenta,cyan,red,white,green,magenta,cyan,yellow,red,blue \"npm:dev:gateway\" \"npm:dev:auth\" \"npm:dev:user\" \"npm:dev:ai\" \"npm:dev:medical\" \"npm:dev:telemedicine\" \"npm:dev:marketplace\" \"npm:dev:delivery\" \"npm:dev:fitness\" \"npm:dev:doctor\" \"npm:dev:farmer\" \"npm:dev:notification\" \"npm:dev:analytics\"",
+    "build": "npm run build -w shared && npm run build --workspaces --if-present",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.9.3",
+    "@types/node": "^24.10.1"
+  }
+}

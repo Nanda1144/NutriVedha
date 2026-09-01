@@ -1,0 +1,21 @@
+{
+  "name": "@nutrivedha/ai",
+  "version": "1.0.0",
+  "description": "NutriVedha AI/ML Service - Gemini disease scan, diet, recipes, chatbot",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nutrivedha/shared": "*",
+    "@google/genai": "^1.0.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  }
+}

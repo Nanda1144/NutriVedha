@@ -1,0 +1,75 @@
+[
+  {
+    "name": "Organic Amla (Pratapgarh)",
+    "category": "Ayurvedic Grade",
+    "harvestDate": "Oct 2026",
+    "price": 85,
+    "marketPrice": 120,
+    "recommended": true,
+    "farmer": {
+      "name": "Ram Singh",
+      "location": "Pratapgarh, UP",
+      "experience": "25 Years",
+      "verified": true,
+      "crops": [
+        "Amla",
+        "Aloe Vera",
+        "Neem"
+      ],
+      "impact": "Supports 100% natural farming in his village."
+    },
+    "description": "Grown without any synthetic fertilizers. High in Vitamin C, perfect for Triphala.",
+    "benefits": "Boosts immunity, improves skin health, supports digestion.",
+    "dietSupport": "Immunity Booster & Detox Diet",
+    "image": "https://images.unsplash.com/photo-1628134707412-23c8a49df5d0?auto=format&fit=crop&q=80&w=600",
+    "id": "01fcc15d-5c93-4ce4-b812-a8b6b3f865f9"
+  },
+  {
+    "name": "Chemical-Free Turmeric",
+    "category": "Natural",
+    "harvestDate": "Jan 2027",
+    "price": 140,
+    "marketPrice": 190,
+    "recommended": true,
+    "farmer": {
+      "name": "Savitri Devi",
+      "location": "Erode, Tamil Nadu",
+      "experience": "15 Years",
+      "verified": true,
+      "crops": [
+        "Turmeric",
+        "Ginger"
+      ],
+      "impact": "Helps preserve native turmeric varieties."
+    },
+    "description": "Traditional Erode turmeric with high curcumin content.",
+    "benefits": "Anti-inflammatory, blood purifier.",
+    "dietSupport": "Anti-Inflammatory Plan",
+    "image": "https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&q=80&w=600",
+    "id": "89dc879b-9c03-451d-834c-eff497e2c31a"
+  },
+  {
+    "name": "Native Ashwagandha Roots",
+    "category": "Ayurvedic Grade",
+    "harvestDate": "Nov 2026",
+    "price": 420,
+    "marketPrice": 550,
+    "recommended": false,
+    "farmer": {
+      "name": "Gopal Mandloi",
+      "location": "Neemuch, MP",
+      "experience": "30 Years",
+      "verified": true,
+      "crops": [
+        "Ashwagandha",
+        "Shatavari"
+      ],
+      "impact": "Empowering local tribal farmers through collective farming."
+    },
+    "description": "Sun-dried using traditional methods to preserve Ojas-building properties.",
+    "benefits": "Reduces stress, improves sleep, boosts energy.",
+    "dietSupport": "Stress Relief & Vitality Diet",
+    "image": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=600",
+    "id": "0ac4259e-7165-4df5-8eb7-258f567443bf"
+  }
+]

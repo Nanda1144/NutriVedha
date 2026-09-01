@@ -1,0 +1,29 @@
+[
+  {
+    "id": "851c3c0a-816d-44f6-a634-ca215201f7b7",
+    "email": "smoke1@test.com",
+    "name": "Smoke Tester",
+    "role": "User",
+    "passwordHash": "$2a$10$r5MSeqRNjRaBjuLIW2PqUOfjcjIU6.HwDVMwtjv3CgYsaX321Fv16",
+    "createdAt": "2026-09-01T16:51:38.077Z",
+    "isAdmin": false
+  },
+  {
+    "id": "145b1127-07cb-4bee-a3af-de73947737a0",
+    "email": "smoke2@test.com",
+    "name": "Smoke Tester",
+    "role": "User",
+    "passwordHash": "$2a$10$htcwVZaVhZHHOOtyAW01M.P6rkRYsnzfyAOcwZ0Nsbxzqe5o2cE2W",
+    "createdAt": "2026-09-01T17:15:04.088Z",
+    "isAdmin": false
+  },
+  {
+    "id": "8f1bec8a-6516-44ef-b158-e0be3ed9c232",
+    "email": "smoke3@test.com",
+    "name": "Smoke Tester",
+    "role": "User",
+    "passwordHash": "$2a$10$L6hF0458BIkSIJPYCq.dnO9.0C2RqGI./zOaVuVdIkm6Z5EKTV2oC",
+    "createdAt": "2026-09-01T17:20:15.025Z",
+    "isAdmin": false
+  }
+]

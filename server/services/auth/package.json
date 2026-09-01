@@ -1,0 +1,22 @@
+{
+  "name": "@nutrivedha/auth",
+  "version": "1.0.0",
+  "description": "NutriVedha Auth Service - JWT, OTP, passkey, RBAC",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nutrivedha/shared": "*",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@nutrivedha/gateway",
+  "version": "1.0.0",
+  "description": "NutriVedha API Gateway",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nutrivedha/shared": "*",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  }
+}
