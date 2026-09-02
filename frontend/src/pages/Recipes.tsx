@@ -36,22 +36,38 @@ const Recipes: React.FC = () => {
         }
     ];
 
-    const generateRecipes = () => {
-        setLoading(true);
-        const inputTags = items.toLowerCase().split(',').map(tag => tag.trim());
+    const [error, setError] = useState<string | null>(null);
+    const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
+    const generateRecipes = () => {
+        setError(null);
+        const raw = items.trim();
+        if (!raw) {
+            setError('Enter at least one ingredient (e.g. Turmeric, Milk)');
+            return;
+        }
+        if (raw.split(',').filter(s => s.trim()).length > 10) {
+            setError('Max 10 ingredients at once.');
+            return;
+        }
+        setLoading(true);
+        const inputTags = raw.toLowerCase().split(',').map(tag => tag.trim()).filter(Boolean);
         setTimeout(() => {
-            const matched = recipeDatabase.filter(recipe =>
-                recipe.tags.some(tag => inputTags.includes(tag))
-            );
-            setRecipes(matched.length > 0 ? matched : recipeDatabase.slice(0, 2));
+            const scored = recipeDatabase.map(r => ({
+                ...r,
+                score: r.tags.filter((t: string) => inputTags.includes(t)).length
+            })).sort((a: any, b: any) => b.score - a.score);
+            const matched = scored.filter((r: any) => r.score > 0);
+            setRecipes(matched.length > 0 ? matched.slice(0, 3) as any : recipeDatabase.slice(0, 2));
             setLoading(false);
-        }, 1000);
+        }, 900);
     };
 
     const handleSave = (recipe: any) => {
-        saveRecipe(recipe);
-        alert("Recipe saved to your profile!");
+        if (savedIds.has(recipe.title)) return;
+        saveRecipe({ ...recipe, id: Date.now().toString(), savedAt: new Date().toISOString() });
+        setSavedIds(prev => new Set(prev).add(recipe.title));
+        setTimeout(() => setSavedIds(prev => { const n = new Set(prev); n.delete(recipe.title); return n; }), 2000);
     };
 
     return (
@@ -74,15 +90,17 @@ const Recipes: React.FC = () => {
                         />
                     </div>
                     <button className="btn btn-primary" onClick={generateRecipes} disabled={loading}>
-                        {loading ? <RefreshCw className="animate-spin" /> : "Find Recipes"}
+                        {loading ? <><RefreshCw className="animate-spin" /> Searching...</> : "Find Recipes"}
                     </button>
                 </div>
                 <div className="popular-tags">
                     <span>Try:</span>
-                    {['Ginger', 'Amla', 'Turmeric', 'Coconut'].map(t => (
+                    {['Ginger', 'Amla', 'Turmeric', 'Coconut', 'Milk', 'Honey'].map(t => (
                         <button key={t} className="tag-chip" onClick={() => setItems(prev => prev ? `${prev}, ${t}` : t)}>{t}</button>
                     ))}
+                    {items && <button className="tag-chip" style={{ borderColor: '#ef4444' }} onClick={() => { setItems(''); setRecipes([]); setError(null); }}>Clear</button>}
                 </div>
+                {error && <div className="glass-card" style={{ padding: '0.7rem 1rem', marginTop: '0.8rem', borderLeft: '3px solid #ef4444', display: 'flex', gap: '0.6rem', alignItems: 'center' }}><span style={{ fontSize: '0.85rem' }}>{error}</span></div>}
             </div>
 
             {recipes.length > 0 ? (
@@ -91,8 +109,8 @@ const Recipes: React.FC = () => {
                         <div key={i} className="recipe-card glass-card animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
                             <div className="recipe-img-placeholder">
                                 <UtensilsCrossed size={48} />
-                                <button className="save-recipe-btn" onClick={() => handleSave(r)}>
-                                    <Save size={20} />
+                                <button className={`save-recipe-btn ${savedIds.has(r.title) ? 'saved' : ''}`} onClick={() => handleSave(r)} title={savedIds.has(r.title) ? 'Saved!' : 'Save to profile'}>
+                                    {savedIds.has(r.title) ? <CheckCircle size={20} className="text-success" /> : <Save size={20} />}
                                 </button>
                             </div>
                             <div className="recipe-details">
@@ -110,6 +128,7 @@ const Recipes: React.FC = () => {
                                     <ol>
                                         {r.steps.map((s: string, idx: number) => <li key={idx}>{s}</li>)}
                                     </ol>
+                                    {savedIds.has(r.title) && <span className="benefits-badge" style={{ marginTop: '0.6rem', background: '#dcfce7' }}><CheckCircle size={12} /> Saved to Profile</span>}
                                 </div>
                             </div>
                         </div>

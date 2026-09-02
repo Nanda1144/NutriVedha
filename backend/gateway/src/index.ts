@@ -16,6 +16,11 @@ const routes: Record<string, number> = {
   analytics: 3011,
   farmer: 3012,
   doctor: 3014,
+  trainer: 3015,
+};
+// Alias: frontend .env uses plural /api/doctors, normalize to singular microservice
+const aliasRoutes: Record<string, string> = {
+  doctors: 'doctor',
 };
 
 const app = createService(gateway, '/api', (app) => {
@@ -26,6 +31,18 @@ const app = createService(gateway, '/api', (app) => {
       target: `http://localhost:${port}`,
       changeOrigin: true,
       pathFilter: `/api/${name}`,
+    });
+    app.use(proxy);
+  }
+  // alias proxies (e.g. /api/doctors -> doctor:3014)
+  for (const [alias, targetName] of Object.entries(aliasRoutes)) {
+    const port = routes[targetName];
+    if (!port) continue;
+    const proxy = createProxyMiddleware({
+      target: `http://localhost:${port}`,
+      changeOrigin: true,
+      pathFilter: `/api/${alias}`,
+      pathRewrite: { [`^/api/${alias}`]: `/api/${targetName}` },
     });
     app.use(proxy);
   }

@@ -1,0 +1,27 @@
+{
+  "collections": ["audit_logs", "activity_events"],
+  "ownerService": "analytics",
+  "description": "Security audit trail and product usage telemetry.",
+  "audit_logs": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "action": "string",
+      "entity": "string",
+      "meta": "string | null (JSON-encoded)",
+      "ip": "string | undefined",
+      "status": "string enum ['Success','Denied'] | undefined",
+      "createdAt": "string (ISO-8601)"
+    },
+    "indexes": ["userId + createdAt desc", "action"]
+  },
+  "activity_events": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "event": "string (e.g. 'Login', 'Diet Plan Generated')",
+      "createdAt": "string (ISO-8601)"
+    },
+    "indexes": ["userId + createdAt desc"]
+  }
+}

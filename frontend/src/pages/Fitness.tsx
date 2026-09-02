@@ -353,9 +353,14 @@ const Fitness: React.FC = () => {
                             <h3>Connect with a Private Trainer?</h3>
                             <p>Enter the unique trainer code provided to you.</p>
                             <div className="id-input-group">
-                                <input type="text" placeholder="Enter Unique ID (e.g. TR-998)" />
-                                <button className="btn btn-success" onClick={() => alert("Searching for trainer...")}>Join Crew</button>
+                                <input type="text" placeholder="Enter Unique ID (e.g. TR-998)" id="trainer-join-input" />
+                                <button className="btn btn-success" onClick={() => {
+                                    const v = (document.getElementById('trainer-join-input') as HTMLInputElement)?.value?.trim();
+                                    if (!v) { alert('Enter a trainer ID (e.g. TR-998)'); return; }
+                                    alert(`Searching for trainer ${v}... (Frontend stub — backend crew link coming)`);
+                                }}>Join Crew</button>
                             </div>
+                            <span className="hint-text" style={{ fontSize: '0.75rem' }}>Demo IDs: TR-998, TR-8829</span>
                         </div>
                     </div>
                 )}

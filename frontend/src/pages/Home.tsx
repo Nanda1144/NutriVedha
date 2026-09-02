@@ -6,11 +6,11 @@ import './Home.css';
 const Home: React.FC = () => {
     const { systemUpdates } = useUserStore();
     const features = [
-        { icon: <Camera size={32} />, title: "AI Disease Scan", desc: "Instantly analyze symptoms using your camera and advanced AI models." },
-        { icon: <Carrot size={32} />, title: "Budget Ayurvedic Diet", desc: "Personalized diet plans using locally available, affordable kitchen items." },
-        { icon: <Stethoscope size={32} />, title: "Teleconsultation", desc: "Connect with certified Ayurvedic specialists from the comfort of your home." },
-        { icon: <Utensils size={32} />, title: "AI Recipe Generator", desc: "Generate healthy recipes based on what's currently in your kitchen." },
-        { icon: <Hand size={32} />, title: "Sign Language AI", desc: "Converting sign language to text and voice for accessible healthcare." }
+        { icon: <Camera size={32} />, title: "AI Disease Scan", path: "/scan", desc: "Instantly analyze symptoms using your camera and advanced AI models." },
+        { icon: <Carrot size={32} />, title: "Budget Ayurvedic Diet", path: "/diet", desc: "Personalized diet plans using locally available, affordable kitchen items." },
+        { icon: <Stethoscope size={32} />, title: "Teleconsultation", path: "/telemedicine", desc: "Connect with certified Ayurvedic specialists from the comfort of your home." },
+        { icon: <Utensils size={32} />, title: "AI Recipe Generator", path: "/recipes", desc: "Generate healthy recipes based on what's currently in your kitchen." },
+        { icon: <Hand size={32} />, title: "Sign Language AI", path: "/sign-ai", desc: "Converting sign language to text and voice for accessible healthcare." }
     ];
 
     return (
@@ -56,7 +56,7 @@ const Home: React.FC = () => {
                                 <div className="feature-icon">{f.icon}</div>
                                 <h3>{f.title}</h3>
                                 <p>{f.desc}</p>
-                                <Link to={`/${f.title.toLowerCase().split(' ').join('-')}`} className="learn-more">
+                                <Link to={f.path} className="learn-more">
                                     Learn more <ArrowRight size={14} />
                                 </Link>
                             </div>
@@ -104,8 +104,8 @@ const Home: React.FC = () => {
                     <h2>Ready to transform your health?</h2>
                     <p>Join thousands of users who are healing naturally with AyurAI Health.</p>
                     <div className="cta-btns">
-                        <button className="btn btn-primary">Sign Up Now</button>
-                        <button className="btn btn-secondary">Explore Recipes</button>
+                        <Link to="/login" className="btn btn-primary">Sign Up Now</Link>
+                        <Link to="/recipes" className="btn btn-secondary">Explore Recipes</Link>
                     </div>
                 </div>
             </section>

@@ -154,9 +154,13 @@ const FoodIntel: React.FC = () => {
                                         <div key={site} className="price-card">
                                             <span className="site-name capitalize">{site}</span>
                                             <span className="price-val">{price}</span>
-                                            <button className="buy-btn">Buy Now</button>
+                                            <button className="buy-btn" onClick={() => { window.open(`https://www.google.com/search?q=buy+${encodeURIComponent(selectedFood.name)}+${site}`, '_blank'); }}>Buy Now</button>
                                         </div>
                                     ))}
+                                </div>
+                                <div style={{ marginTop: '0.8rem', display: 'flex', gap: '0.6rem' }}>
+                                    <button className="btn btn-outline btn-sm" onClick={() => navigator.clipboard.writeText(selectedFood.name)}>Copy Name</button>
+                                    <span className="hint-text" style={{ fontSize: '0.75rem' }}>Prices indicative — opens Google search</span>
                                 </div>
                             </div>
                         </div>

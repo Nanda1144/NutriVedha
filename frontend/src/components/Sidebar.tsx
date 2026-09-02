@@ -12,12 +12,18 @@ import {
     Stethoscope,
     MessageSquare,
     User,
+    Users,
     ShieldCheck,
     ShieldAlert,
     Settings,
     ChevronRight,
     LayoutDashboard,
-    LogIn
+    LogIn,
+    Package,
+    BarChart3,
+    Sprout,
+    Truck,
+    Clock
 } from 'lucide-react';
 import { useUserStore } from '../store/userStore';
 import './Sidebar.css';
@@ -29,20 +35,48 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     const location = useLocation();
-    const { isAdminAuthenticated } = useUserStore();
+    const { isAdminAuthenticated, userProfile } = useUserStore();
+    const role = userProfile.role;
 
-    const menuItems = [
-        { name: 'Home Portal', path: '/', icon: <Home size={20} /> },
-        { name: 'Command Center', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-        { name: 'AI Disease Scan', path: '/scan', icon: <Zap size={20} /> },
-        { name: 'Ayurvedic Diet', path: '/diet', icon: <Utensils size={20} /> },
-        { name: 'Recipe Generator', path: '/recipes', icon: <BookOpen size={20} /> },
-        { name: 'Food Intelligence', path: '/food-intel', icon: <Info size={20} /> },
-        { name: 'Marketplace', path: '/marketplace', icon: <ShoppingBag size={20} /> },
-        { name: 'Fitness & Yoga', path: '/fitness', icon: <Dumbbell size={20} /> },
-        { name: 'Telemedicine', path: '/telemedicine', icon: <Stethoscope size={20} /> },
-        { name: 'Sign AI', path: '/sign-ai', icon: <MessageSquare size={20} /> },
+    const allMenuItems = [
+        { name: 'Home Portal', path: '/', icon: <Home size={20} />, roles: ['User', 'Doctor', 'Trainer', 'Farmer', 'Delivery', 'Admin'] },
+        { name: 'Command Center', path: '/dashboard', icon: <LayoutDashboard size={20} />, roles: ['User', 'Doctor', 'Trainer', 'Farmer', 'Delivery'] },
+        { name: 'AI Disease Scan', path: '/scan', icon: <Zap size={20} />, roles: ['User', 'Doctor'] },
+        { name: 'Ayurvedic Diet', path: '/diet', icon: <Utensils size={20} />, roles: ['User', 'Doctor'] },
+        { name: 'Recipe Generator', path: '/recipes', icon: <BookOpen size={20} />, roles: ['User'] },
+        { name: 'Food Intelligence', path: '/food-intel', icon: <Info size={20} />, roles: ['User'] },
+        { name: 'Marketplace', path: '/marketplace', icon: <ShoppingBag size={20} />, roles: ['User', 'Farmer'] },
+        { name: 'Fitness & Yoga', path: '/fitness', icon: <Dumbbell size={20} />, roles: ['User', 'Trainer'] },
+        { name: 'Telemedicine', path: '/telemedicine', icon: <Stethoscope size={20} />, roles: ['User', 'Doctor'] },
+        { name: 'Sign AI', path: '/sign-ai', icon: <MessageSquare size={20} />, roles: ['User'] },
+        { name: 'Reports Vault', path: '/reports', icon: <ShieldCheck size={20} />, roles: ['User', 'Doctor'] },
+        { name: 'Delivery Tracking', path: '/delivery-tracking', icon: <ShoppingBag size={20} />, roles: ['User', 'Delivery'] },
+        { name: 'Saved Vault', path: '/saved', icon: <BookOpen size={20} />, roles: ['User'] },
+        { name: 'Search', path: '/search', icon: <Info size={20} />, roles: ['User', 'Doctor', 'Trainer', 'Farmer', 'Delivery'] },
     ];
+
+    const doctorMenuItems: { name: string; path: string; icon: React.ReactNode }[] = [
+        { name: 'Doctor Availability', path: '/doctor/availability', icon: <Stethoscope size={20} /> },
+        { name: 'Doctor Profile', path: '/doctor/profile', icon: <ShieldCheck size={20} /> },
+    ];
+    const trainerMenuItems: { name: string; path: string; icon: React.ReactNode }[] = [
+        { name: 'Trainer Profile', path: '/trainer/profile', icon: <Dumbbell size={20} /> },
+        { name: 'Trainee Details', path: '/dashboard', icon: <Users size={20} /> },
+    ];
+    const farmerMenuItems: { name: string; path: string; icon: React.ReactNode }[] = [
+        { name: 'Farmer Profile', path: '/farmer/profile', icon: <Sprout size={20} /> },
+        { name: 'My Products', path: '/farmer/products', icon: <Package size={20} /> },
+        { name: 'Customer Orders', path: '/farmer/orders', icon: <ShoppingBag size={20} /> },
+        { name: 'Sales Reports', path: '/farmer/reports', icon: <BarChart3 size={20} /> },
+    ];
+    const deliveryMenuItems: { name: string; path: string; icon: React.ReactNode }[] = [
+        { name: 'Delivery Profile', path: '/delivery/profile', icon: <Truck size={20} /> },
+        { name: 'Delivery History', path: '/delivery/history', icon: <Clock size={20} /> },
+        { name: 'Customer Orders', path: '/farmer/orders', icon: <ShoppingBag size={20} /> },
+    ];
+
+    const menuItems = allMenuItems.filter(item => (item.roles as string[]).includes(role));
+    const showDoctorExtras = role === 'Doctor';
 
     return (
         <>
@@ -79,6 +113,54 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                 <ChevronRight className="link-arrow" size={14} />
                             </Link>
                         ))}
+                        {showDoctorExtras && doctorMenuItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <span className="link-icon">{item.icon}</span>
+                                <span className="link-text">{item.name}</span>
+                                <ChevronRight className="link-arrow" size={14} />
+                            </Link>
+                        ))}
+                        {role === 'Trainer' && trainerMenuItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <span className="link-icon">{item.icon}</span>
+                                <span className="link-text">{item.name}</span>
+                                <ChevronRight className="link-arrow" size={14} />
+                            </Link>
+                        ))}
+                        {role === 'Farmer' && farmerMenuItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <span className="link-icon">{item.icon}</span>
+                                <span className="link-text">{item.name}</span>
+                                <ChevronRight className="link-arrow" size={14} />
+                            </Link>
+                        ))}
+                        {role === 'Delivery' && deliveryMenuItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+                                onClick={onClose}
+                            >
+                                <span className="link-icon">{item.icon}</span>
+                                <span className="link-text">{item.name}</span>
+                                <ChevronRight className="link-arrow" size={14} />
+                            </Link>
+                        ))}
                     </nav>
 
                     <div className="sidebar-section-label">Account</div>
@@ -104,6 +186,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                                 <Link to="/admin-control" className="sidebar-link admin-link" onClick={onClose}>
                                     <span className="link-icon"><ShieldAlert size={20} className="text-danger" /></span>
                                     <span className="link-text">Admin Dashboard</span>
+                                    <ChevronRight className="link-arrow" size={14} />
+                                </Link>
+                                <Link to="/admin/users" className="sidebar-link admin-link" onClick={onClose}>
+                                    <span className="link-icon"><Users size={20} className="text-primary" /></span>
+                                    <span className="link-text">User Management</span>
                                     <ChevronRight className="link-arrow" size={14} />
                                 </Link>
                             </nav>

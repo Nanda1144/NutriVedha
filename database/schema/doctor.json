@@ -1,0 +1,29 @@
+{
+  "collections": ["doctor_profiles", "patient_records"],
+  "ownerService": "doctor",
+  "description": "Practitioner credentials/verification and supervised patient records.",
+  "doctor_profiles": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (ref users.id, indexed)",
+      "name": "string",
+      "specialization": "string",
+      "regNumber": "string (registration no.)",
+      "verified": "boolean (admin-gated)",
+      "patients": "number",
+      "experience": "string"
+    },
+    "indexes": ["userId", "regNumber"]
+  },
+  "patient_records": {
+    "fields": {
+      "id": "string (uuid)",
+      "doctorId": "string (ref doctor_profiles.id)",
+      "userId": "string (ref users.id)",
+      "name": "string",
+      "lastVisit": "string",
+      "notes": "string"
+    },
+    "indexes": ["doctorId", "userId"]
+  }
+}

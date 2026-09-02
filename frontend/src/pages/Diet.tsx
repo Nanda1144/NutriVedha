@@ -61,14 +61,39 @@ const Diet: React.FC = () => {
     const handleEditMeal = (index: number, field: keyof Meal, value: string) => {
         const updated = [...customMeals];
         if (field === 'ingredients') {
-            updated[index][field] = value.split(',').map(v => v.trim());
+            const cleaned = value.split(',').map(v => v.trim()).filter(Boolean);
+            if (cleaned.length === 0) return;
+            updated[index][field] = cleaned;
         } else {
-            (updated[index] as any)[field] = value;
+            if (!value.trim()) return;
+            (updated[index] as any)[field] = value.trim();
         }
         setCustomMeals(updated);
     };
 
+    const handleDeleteMeal = (index: number) => {
+        if (customMeals.length <= 1) {
+            alert('At least one meal must remain. Edit it instead of deleting.');
+            return;
+        }
+        if (!window.confirm(`Remove ${customMeals[index].meal}?`)) return;
+        setCustomMeals(customMeals.filter((_, i) => i !== index));
+        setIsEditing(null);
+    };
+
+    const handleAddMeal = () => {
+        const times = ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Evening', 'Extra'];
+        const nextTime = times.find(t => !customMeals.some(m => m.time === t)) || `Meal ${customMeals.length + 1}`;
+        setCustomMeals([...customMeals, { time: nextTime, meal: "New Meal", ingredients: ["Ingredient"], budget: true, health: "Custom" }]);
+        setIsEditing(customMeals.length);
+    };
+
     const handleSave = () => {
+        const invalid = customMeals.find(m => !m.meal.trim() || m.ingredients.length === 0);
+        if (invalid) {
+            alert('Each meal needs a name and at least one ingredient.');
+            return;
+        }
         saveDietPlan({
             id: Date.now(),
             date: new Date().toISOString(),
@@ -77,7 +102,7 @@ const Diet: React.FC = () => {
             type: dietType
         });
         setIsSaved(true);
-        setTimeout(() => setIsSaved(false), 2000);
+        setTimeout(() => setIsSaved(false), 2500);
     };
 
     return (
@@ -150,15 +175,19 @@ const Diet: React.FC = () => {
                                     type="text"
                                     value={p.meal}
                                     onChange={(e) => handleEditMeal(i, 'meal', e.target.value)}
-                                    placeholder="Meal Name"
+                                    placeholder="Meal Name (min 3 chars)"
+                                    maxLength={60}
                                 />
                                 <input
                                     type="text"
                                     value={p.ingredients.join(', ')}
                                     onChange={(e) => handleEditMeal(i, 'ingredients', e.target.value)}
-                                    placeholder="Ingredients (comma separated)"
+                                    placeholder="Ingredients (comma separated, e.g. Oats, Honey)"
                                 />
-                                <button className="btn btn-primary btn-sm" onClick={() => setIsEditing(null)}><Check size={16} /></button>
+                                <select value={p.time} onChange={(e) => handleEditMeal(i, 'time' as any, e.target.value)} style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                    <option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Evening</option><option>Extra</option>
+                                </select>
+                                <button className="btn btn-primary btn-sm" onClick={() => setIsEditing(null)}><Check size={16} /> Done</button>
                             </div>
                         ) : (
                             <div className="meal-content">
@@ -174,26 +203,40 @@ const Diet: React.FC = () => {
 
                         <div className="meal-actions">
                             {dietType !== 'doctor' && (
-                                <button className="icon-btn" onClick={() => setIsEditing(i === isEditing ? null : i)}>
+                                <button className="icon-btn" onClick={() => setIsEditing(i === isEditing ? null : i)} title={isEditing === i ? 'Cancel' : 'Edit meal'}>
                                     <Edit2 size={16} />
                                 </button>
                             )}
-                            <button className="icon-btn text-danger">
-                                <Trash2 size={16} />
-                            </button>
+                            {dietType !== 'doctor' ? (
+                                <button className="icon-btn text-danger" onClick={() => handleDeleteMeal(i)} title="Delete meal">
+                                    <Trash2 size={16} />
+                                </button>
+                            ) : (
+                                <span className="hint-text" style={{ fontSize: '0.7rem' }}>Doctor locked</span>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
 
             <div className="diet-footer-actions">
-                <button className="btn btn-outline" onClick={() => setCustomMeals([...customMeals, { time: "Extra", meal: "New Snack", ingredients: [], budget: true, health: "Optional" }])}>
-                    <Plus size={18} /> Add Meal
-                </button>
+                {dietType !== 'doctor' ? (
+                    <button className="btn btn-outline" onClick={handleAddMeal}>
+                        <Plus size={18} /> Add Meal
+                    </button>
+                ) : (
+                    <span className="hint-text">Doctor Verified plan is read-only. Duplicate to custom to edit.</span>
+                )}
                 <button className={`btn ${isSaved ? 'btn-success' : 'btn-primary'}`} onClick={handleSave}>
                     <Save size={18} /> {isSaved ? 'Plan Saved!' : 'Save This Plan'}
                 </button>
             </div>
+            {dietType !== 'doctor' && customMeals.length > 0 && (
+                <div className="glass-card" style={{ marginTop: '1rem', padding: '0.8rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="hint-text">{customMeals.length} meals • {customMeals.reduce((a, m) => a + m.ingredients.length, 0)} ingredients • Est. cost: Low</span>
+                    <Link to="/marketplace" className="btn btn-ghost btn-xs">Source ingredients →</Link>
+                </div>
+            )}
         </div>
     );
 };

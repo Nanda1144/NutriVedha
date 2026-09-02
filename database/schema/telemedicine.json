@@ -1,0 +1,32 @@
+{
+  "collections": ["doctors", "appointments"],
+  "ownerService": "telemedicine",
+  "description": "Practitioner directory and consultation bookings.",
+  "doctors": {
+    "fields": {
+      "id": "string (uuid)",
+      "name": "string",
+      "specialization": "string",
+      "experience": "string",
+      "rating": "number (0-5)",
+      "reviews": "number",
+      "status": "string enum ['Available','In Call','Offline']",
+      "fee": "number (INR)",
+      "photo": "string (url)"
+    },
+    "seededInCode": true
+  },
+  "appointments": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "doctorId": "string (ref doctors.id)",
+      "date": "string",
+      "time": "string",
+      "mode": "string enum ['video','chat']",
+      "status": "string enum ['Booked','Completed','Cancelled']",
+      "createdAt": "string (ISO-8601)"
+    },
+    "indexes": ["doctorId + date", "userId"]
+  }
+}

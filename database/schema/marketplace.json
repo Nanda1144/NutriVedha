@@ -1,0 +1,45 @@
+{
+  "collections": ["crops", "crop_bookings"],
+  "ownerService": "marketplace",
+  "description": "Farm-to-home produce listings and pre-bookings.",
+  "crops": {
+    "fields": {
+      "id": "string (uuid)",
+      "name": "string",
+      "category": "string",
+      "harvestDate": "string",
+      "price": "number (INR per kg)",
+      "marketPrice": "number",
+      "recommended": "boolean",
+      "farmer": "object { name, location, experience, verified, crops[], impact }",
+      "description": "string",
+      "benefits": "string",
+      "dietSupport": "string",
+      "image": "string (url)"
+    },
+    "example": {
+      "id": "e1",
+      "name": "Organic Amla (Pratapgarh)",
+      "category": "Ayurvedic Grade",
+      "harvestDate": "Oct 2026",
+      "price": 85,
+      "marketPrice": 120,
+      "recommended": true,
+      "farmer": { "name": "Ram Singh", "location": "Pratapgarh, UP", "verified": true },
+      "dietSupport": "Immunity Booster & Detox Diet"
+    }
+  },
+  "crop_bookings": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "cropId": "string (ref crops.id)",
+      "quantity": "number",
+      "totalPrice": "number (price*qty + delivery fee)",
+      "status": "string enum ['Growing','Harvested','Packed','Out for Delivery','Delivered']",
+      "orderDate": "string",
+      "paymentIntentId": "string (simulated payment)"
+    },
+    "indexes": ["userId", "status"]
+  }
+}

@@ -65,9 +65,10 @@ const Profile: React.FC = () => {
     };
 
     const handleLogout = () => {
-        if (window.confirm("Are you sure you want to logout?")) {
-            alert("Logging out from all devices...");
-            window.location.href = "/";
+        if (window.confirm("Log out from this device? (Frontend-only: clears local session)")) {
+            localStorage.removeItem('ayurai-health-storage-v8');
+            localStorage.removeItem('nv_token');
+            window.location.href = "/login";
         }
     };
 
@@ -111,29 +112,37 @@ const Profile: React.FC = () => {
         });
     };
 
+    const [deleteScheduled, setDeleteScheduled] = useState(false);
     const handleDeleteAccount = () => {
         if (deleteConfirmText === 'DELETE') {
-            alert(`Account deletion scheduled for ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}. You can cancel this request within 30 days.`);
+            const date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN');
+            setDeleteScheduled(true);
             setShowDeleteModal(false);
             setDeleteConfirmText('');
             addAuditLog({
                 accessor: 'System',
                 role: 'AI',
-                action: 'Scheduled Account Deletion (30-day Grace Period)',
+                action: `Scheduled Account Deletion (30-day Grace until ${date})`,
                 status: 'Success'
             });
         }
     };
 
+    const [passError, setPassError] = useState<string | null>(null);
+    const [passSuccess, setPassSuccess] = useState(false);
     const handleChangePassword = (e: React.FormEvent) => {
         e.preventDefault();
-        if (passwords.new !== passwords.confirm) {
-            alert("Neural convergence failed: Passwords do not match.");
-            return;
-        }
-        alert("Neural Passkey synchronized successfully.");
-        setShowPasswordModal(false);
-        setPasswords({ current: '', new: '', confirm: '' });
+        setPassError(null);
+        if (passwords.new.length < 8) { setPassError('New passkey must be at least 8 characters.'); return; }
+        if (passwords.new !== passwords.confirm) { setPassError('Passwords do not match.'); return; }
+        if (passwords.new === passwords.current) { setPassError('New passkey must differ from current.'); return; }
+        setPassSuccess(true);
+        setTimeout(() => {
+            setPassSuccess(false);
+            setShowPasswordModal(false);
+            setPasswords({ current: '', new: '', confirm: '' });
+            setPassError(null);
+        }, 800);
         addAuditLog({
             accessor: 'You (User)',
             role: 'User',
@@ -538,7 +547,7 @@ const Profile: React.FC = () => {
                                             </div>
                                             <div className="r-actions-privacy">
                                                 <button className="icon-btn-text"><Eye size={14} /> Open</button>
-                                                <button className="icon-btn-text text-danger" onClick={() => { if (window.confirm("Revoke all access to this file?")) alert("Access Revoked."); }}>Revoke</button>
+                                                <button className="icon-btn-text text-danger" onClick={() => { if (window.confirm("Revoke all access to this file?")) { addAuditLog({ accessor: 'You (User)', role: 'User', action: `Revoked access to ${r.condition}`, status: 'Success' }); } }}>Revoke</button>
                                             </div>
                                         </div>
                                     )) : (
@@ -672,7 +681,7 @@ const Profile: React.FC = () => {
                                         <strong>Online</strong>
                                         <span>Synced {securitySettings.lastBackup}</span>
                                     </div>
-                                    <button className="btn btn-primary btn-sm btn-full" onClick={() => { alert("Syncing data blocks..."); updateSecurity({ lastBackup: 'Today ' + new Date().toLocaleTimeString() }); }}>Sync Now</button>
+                                    <button className="btn btn-primary btn-sm btn-full" onClick={() => { updateSecurity({ lastBackup: 'Today ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }); addAuditLog({ accessor: 'You (User)', role: 'User', action: 'Triggered Cloud Backup Sync', status: 'Success' }); }}>Sync Now</button>
                                 </div>
                                 <div className="security-card glass-card">
                                     <div className="sc-icon"><Key size={24} /></div>
@@ -700,7 +709,13 @@ const Profile: React.FC = () => {
                                     <div className="c-icon"><Download /></div>
                                     <h3>Export Data (JSON)</h3>
                                     <p>Comprehensive dump of all health and fitness data.</p>
-                                    <button className="btn btn-primary btn-sm" onClick={() => alert("Neutral export generated: ayurai-vault.zip")}>Generate Export</button>
+                                    <button className="btn btn-primary btn-sm" onClick={() => {
+                                        const data = { profile: userProfile, reports, fitnessProfile, exportedAt: new Date().toISOString() };
+                                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a'); a.href = url; a.download = `ayurai-vault-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+                                        addAuditLog({ accessor: 'You (User)', role: 'User', action: 'Exported Data Vault (JSON)', status: 'Success' });
+                                    }}>Generate Export</button>
                                 </div>
                                 <div className="control-card glass-card danger-zone">
                                     <div className="c-icon text-danger"><Trash2 /></div>
@@ -712,8 +727,10 @@ const Profile: React.FC = () => {
 
                             <div className="grace-period-info glass-card">
                                 <Clock size={16} />
-                                <span>Note: All deletion requests include a 30-day grace period for full recovery.</span>
+                                <span>{deleteScheduled ? `Deletion scheduled — recoverable until ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('en-IN')} • Check Activity Logs` : 'Note: All deletion requests include a 30-day grace period for full recovery.'}</span>
                             </div>
+                            {passError && <div className="glass-card" style={{ padding: '0.7rem 1rem', borderLeft: '3px solid #ef4444', marginTop: '0.8rem' }}>{passError}</div>}
+                            {passSuccess && <div className="glass-card" style={{ padding: '0.7rem 1rem', borderLeft: '3px solid #10b981', marginTop: '0.8rem' }}>Neural Passkey synchronized successfully!</div>}
                         </div>
                     )}
                 </main>

@@ -1,0 +1,36 @@
+{
+  "collections": ["livestock", "farmer_inventory", "farmer_earnings"],
+  "ownerService": "farmer",
+  "description": "Farmer assets, sellable stock and income tracking.",
+  "livestock": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "name": "string",
+      "type": "string",
+      "breed": "string",
+      "age": "string",
+      "health": "string enum ['Healthy','Needs Attention']"
+    }
+  },
+  "farmer_inventory": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "name": "string",
+      "stock": "number",
+      "unit": "string (e.g. kg)",
+      "price": "number (INR)"
+    }
+  },
+  "farmer_earnings": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "month": "string (e.g. 2026-01)",
+      "amount": "number",
+      "source": "string (default 'Marketplace')"
+    },
+    "indexes": ["userId + month"]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "collections": ["delivery_orders", "tracking_points"],
+  "ownerService": "delivery",
+  "description": "Order fulfilment queue and live GPS telemetry.",
+  "delivery_orders": {
+    "fields": {
+      "id": "string (uuid)",
+      "orderId": "string (friendly id, e.g. ORD-101)",
+      "customer": "string",
+      "address": "string",
+      "items": "string",
+      "status": "string enum ['Pending','In Transit','Out for Delivery','Delivered']",
+      "assignedTo": "string | null (delivery staff userId)",
+      "createdAt": "string (ISO-8601)"
+    },
+    "indexes": ["orderId unique", "status"]
+  },
+  "tracking_points": {
+    "fields": {
+      "id": "string (uuid)",
+      "orderId": "string (ref delivery_orders.orderId, indexed)",
+      "lat": "number",
+      "lng": "number",
+      "note": "string",
+      "timestamp": "string (ISO-8601)"
+    },
+    "indexes": ["orderId + timestamp asc"]
+  }
+}

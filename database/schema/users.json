@@ -1,0 +1,25 @@
+{
+  "collection": "users",
+  "ownerService": "auth",
+  "description": "Registered accounts + role-based access control identities.",
+  "fields": {
+    "id": "string (uuid)",
+    "email": "string (unique, indexed)",
+    "phone": "string (optional, indexed)",
+    "name": "string",
+    "role": "string enum ['User','Doctor','Trainer','Farmer','Delivery','Admin']",
+    "passwordHash": "string (bcrypt, never plaintext)",
+    "createdAt": "string (ISO-8601)",
+    "isAdmin": "boolean"
+  },
+  "example": {
+    "id": "b9f1c0d2-0000-4000-8000-000000000001",
+    "email": "rajesh.k@example.com",
+    "phone": "+91 98765 43210",
+    "name": "Rajesh Kumar",
+    "role": "User",
+    "createdAt": "2026-01-27T08:15:00.000Z",
+    "isAdmin": false
+  },
+  "indexes": ["email unique", "phone"]
+}

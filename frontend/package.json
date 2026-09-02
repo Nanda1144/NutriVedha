@@ -1,8 +1,18 @@
 {
   "name": "ayurai-health",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
+  "description": "NutriVedha is a professional-grade HealthTech application that bridges 5,000 years of Ayurvedic wisdom with cutting-edge Generative AI. It empowers practitioners (Vaidyas) and patients to manage health through biological precision, market-aware dietetics, and real-time biometric monitoring.",
+  "homepage": "https://github.com/Nanda1144/NutriVedha#readme",
+  "bugs": {
+    "url": "https://github.com/Nanda1144/NutriVedha/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nanda1144/NutriVedha.git"
+  },
   "type": "module",
+  "main": "eslint.config.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

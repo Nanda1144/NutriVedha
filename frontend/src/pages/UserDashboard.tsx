@@ -9,6 +9,7 @@ import {
     Clock,
     ArrowUpRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 
 const UserDashboard: React.FC = () => {
@@ -66,7 +67,7 @@ const UserDashboard: React.FC = () => {
                         <li>Optimal yoga window: 6:00 AM</li>
                         <li>Reduce spicy food (Pitta high)</li>
                     </ul>
-                    <button className="btn btn-ghost btn-xs btn-full">View Full Analysis</button>
+                    <Link to="/scan" className="btn btn-ghost btn-xs btn-full">View Full Analysis</Link>
                 </div>
 
                 {/* Medical Reports */}
@@ -87,7 +88,7 @@ const UserDashboard: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                    <button className="btn btn-outline btn-xs btn-full mt-10">Manage Vault</button>
+                    <Link to="/profile" className="btn btn-outline btn-xs btn-full mt-10">Manage Vault</Link>
                 </div>
 
                 {/* Lifestyle & Fitness */}
@@ -107,7 +108,7 @@ const UserDashboard: React.FC = () => {
                             <p className="session-time">Tom, 06:30 AM</p>
                         </div>
                     </div>
-                    <button className="btn btn-primary btn-sm btn-full mt-10">Launch Trainer</button>
+                    <Link to="/fitness" className="btn btn-primary btn-sm btn-full mt-10">Launch Trainer</Link>
                 </div>
 
                 {/* Crop Pre-bookings */}
@@ -129,7 +130,7 @@ const UserDashboard: React.FC = () => {
                     <div className="progress-bar-small">
                         <div className="progress-fill" style={{ width: '65%' }}></div>
                     </div>
-                    <button className="btn btn-outline btn-xs btn-full mt-10">Track Harvest</button>
+                    <Link to="/marketplace" className="btn btn-outline btn-xs btn-full mt-10">Track Harvest</Link>
                 </div>
 
                 {/* Orders & Deliveries */}

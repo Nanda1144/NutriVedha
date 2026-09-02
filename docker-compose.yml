@@ -1,0 +1,95 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nutrivedha-postgres
+    environment:
+      POSTGRES_DB: ${PGDATABASE:-nutrivedha}
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-postgres}"]
+      interval: 5s
+      retries: 10
+
+  gateway:
+    build: ./backend/gateway
+    ports: ["8080:8080"]
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+
+  auth:
+    build: ./backend/services/auth
+    env_file: .env
+    depends_on: [postgres, gateway]
+    command: npm run dev
+  user:
+    build: ./backend/services/user
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  ai:
+    build: ./backend/services/ai
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  medical:
+    build: ./backend/services/medical
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  telemedicine:
+    build: ./backend/services/telemedicine
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  marketplace:
+    build: ./backend/services/marketplace
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  delivery:
+    build: ./backend/services/delivery
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  fitness:
+    build: ./backend/services/fitness
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  doctor:
+    build: ./backend/services/doctor
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  farmer:
+    build: ./backend/services/farmer
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  notification:
+    build: ./backend/services/notification
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  analytics:
+    build: ./backend/services/analytics
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+  trainer:
+    build: ./backend/services/trainer
+    env_file: .env
+    depends_on: [postgres]
+    command: npm run dev
+
+volumes:
+  pgdata:

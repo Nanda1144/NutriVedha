@@ -1,0 +1,26 @@
+{
+  "collection": "notifications",
+  "ownerService": "notification",
+  "description": "Per-user inbox for push/email/in-app alerts.",
+  "fields": {
+    "id": "string (uuid)",
+    "userId": "string (indexed)",
+    "title": "string",
+    "message": "string",
+    "type": "string enum ['appointment','order','premium','health','alert']",
+    "read": "boolean",
+    "sentAt": "string (ISO-8601)",
+    "channel": "string enum ['push','email','inapp']"
+  },
+  "example": {
+    "id": "n1",
+    "userId": "b9f1c0d2-0000-4000-8000-000000000001",
+    "title": "Appointment reminder",
+    "message": "Your consultation with Dr. Ananya starts in 15 minutes.",
+    "type": "appointment",
+    "read": false,
+    "sentAt": "2026-01-27T09:45:00.000Z",
+    "channel": "inapp"
+  },
+  "indexes": ["userId + sentAt desc", "read"]
+}

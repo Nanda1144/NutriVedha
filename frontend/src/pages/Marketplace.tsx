@@ -78,21 +78,74 @@ const Marketplace: React.FC = () => {
         }
     ];
 
+    const [qtyError, setQtyError] = useState<string | null>(null);
+
+    const handleQtyChange = (delta: number) => {
+        setQtyError(null);
+        const next = quantity + delta;
+        if (next < 1) {
+            setQtyError('Minimum 1kg');
+            return;
+        }
+        if (next > 20) {
+            setQtyError('Max 20kg per booking (contact farmer for bulk)');
+            return;
+        }
+        setQuantity(next);
+    };
+
     const handlePreBook = () => {
+        if (!selectedCrop) return;
+        if (quantity < 1 || quantity > 20) {
+            setQtyError('Quantity must be 1–20kg');
+            return;
+        }
+        const existing = cropBookings.find((b: any) => b.crop.id === selectedCrop.id && b.status === 'Growing');
+        if (existing) {
+            if (!window.confirm(`You already have ${existing.quantity}kg of ${selectedCrop.name} growing. Add ${quantity}kg more?`)) return;
+        }
         const booking = {
-            id: Date.now(),
+            id: `BK-${Date.now()}`,
             crop: selectedCrop,
             quantity,
             totalPrice: (selectedCrop.price * quantity) + 40,
-            status: 'Growing',
-            orderDate: new Date().toLocaleDateString()
+            status: 'Growing' as const,
+            orderDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            paymentIntentId: `pi_sim_${Math.random().toString(36).slice(2, 9)}`
         };
         addCropBooking(booking);
         setBookingSuccess(true);
         setTimeout(() => {
             setBookingSuccess(false);
             setView('bookings');
-        }, 2000);
+            setQuantity(1);
+        }, 1200);
+    };
+
+    const handleModifyQty = (booking: any, delta: number) => {
+        const newQty = booking.quantity + delta;
+        if (newQty < 1) { alert('Minimum 1kg — use Cancel instead.'); return; }
+        if (newQty > 20) { alert('Max 20kg'); return; }
+        // update in store by removing and re-adding (simple frontend patch)
+        const updated = { ...booking, quantity: newQty, totalPrice: (booking.crop.price * newQty) + 40 };
+        // Zustand store doesn't have update, so we hack via localStorage patch + reload bookings view
+        const store = useUserStore.getState();
+        (store as any).cropBookings = (store as any).cropBookings.map((b: any) => b.id === booking.id ? updated : b);
+        useUserStore.setState({ cropBookings: (store as any).cropBookings });
+    };
+
+    const handleRepeatBooking = (booking: any) => {
+        setSelectedCrop(booking.crop);
+        setQuantity(booking.quantity);
+        setView('detail');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelBooking = (id: string) => {
+        if (!window.confirm('Cancel this pre-booking? Farmer will be notified.')) return;
+        const store = useUserStore.getState();
+        (store as any).cropBookings = (store as any).cropBookings.filter((b: any) => b.id !== id);
+        useUserStore.setState({ cropBookings: (store as any).cropBookings });
     };
 
     return (
@@ -213,12 +266,13 @@ const Marketplace: React.FC = () => {
 
                             <div className="booking-controls">
                                 <div className="qty-selector">
-                                    <label>Quantity (kg)</label>
+                                    <label>Quantity (kg) — min 1, max 20</label>
                                     <div className="qty-btns">
-                                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+                                        <button onClick={() => handleQtyChange(-1)} disabled={quantity <= 1}>-</button>
                                         <span>{quantity}</span>
-                                        <button onClick={() => setQuantity(quantity + 1)}>+</button>
+                                        <button onClick={() => handleQtyChange(1)} disabled={quantity >= 20}>+</button>
                                     </div>
+                                    {qtyError && <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{qtyError}</span>}
                                 </div>
 
                                 <div className="price-breakdown">
@@ -325,9 +379,12 @@ const Marketplace: React.FC = () => {
                                     </div>
 
                                     <div className="booking-actions">
-                                        <button className="btn btn-outline btn-sm">Modify Qty</button>
-                                        <button className="btn btn-outline btn-sm">Repeat Booking</button>
+                                        <button className="btn btn-outline btn-sm" onClick={() => handleModifyQty(booking, -1)} title="Decrease 1kg">−1kg</button>
+                                        <button className="btn btn-outline btn-sm" onClick={() => handleModifyQty(booking, 1)} title="Increase 1kg">+1kg</button>
+                                        <button className="btn btn-outline btn-sm" onClick={() => handleRepeatBooking(booking)}>Repeat</button>
+                                        <button className="btn btn-ghost btn-sm text-danger" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
                                     </div>
+                                    <span className="hint-text" style={{ fontSize: '0.75rem', marginTop: '0.4rem', display: 'block' }}>Payment: {booking.paymentIntentId || 'pi_sim_...'} • Total ₹{booking.totalPrice}</span>
                                 </div>
                             ))}
                         </div>

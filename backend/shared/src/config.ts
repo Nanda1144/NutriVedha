@@ -4,10 +4,24 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Load root .env (NutriVedha/.env) then server-level env files.
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env'), quiet: true });
+// Load env files in priority order:
+//   1. <repo-root>/backend/.env   (backend-specific overrides)
+//   2. <repo-root>/.env           (shared monorepo root env)
+//   3. process.env / shell-provided vars
+dotenv.config({ path: path.resolve(__dirname, '../../.env'), quiet: true });
 dotenv.config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
 dotenv.config({ quiet: true });
+
+export interface PgConfig {
+  url?: string;
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
+  poolSize: number;
+  configured: boolean;
+}
 
 export interface ServiceConfig {
   name: string;
@@ -17,6 +31,21 @@ export interface ServiceConfig {
   jwtExpiry: string;
   medicalEncryptionKey: string;
   corsOrigin: string;
+  pg: PgConfig;
+}
+
+export function getPgConfig(): PgConfig {
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  return {
+    url,
+    host: process.env.PGHOST || 'localhost',
+    port: parseInt(process.env.PGPORT || '5432', 10),
+    database: process.env.PGDATABASE || process.env.MONGODB_DB_NAME || 'nutrivedha',
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || 'postgres',
+    poolSize: parseInt(process.env.PG_POOL_SIZE || process.env.PGPOOL_SIZE || '10', 10),
+    configured: Boolean(url || process.env.PGHOST || process.env.PGDATABASE),
+  };
 }
 
 export function getConfig(name: string, defaultPort: number): ServiceConfig {
@@ -29,5 +58,6 @@ export function getConfig(name: string, defaultPort: number): ServiceConfig {
     jwtExpiry: process.env.VITE_AUTH_JWT_EXPIRY || '7d',
     medicalEncryptionKey: process.env.VITE_MEDICAL_ENCRYPTION_KEY || 'dev-encryption-key-32chars!!',
     corsOrigin: process.env.VITE_CORS_ORIGIN || 'http://localhost:5173',
+    pg: getPgConfig(),
   };
 }

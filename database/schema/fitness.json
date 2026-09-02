@@ -1,0 +1,35 @@
+{
+  "collections": ["workouts", "fitness_log"],
+  "ownerService": "fitness",
+  "description": "Guided workout library and per-user completion history.",
+  "workouts": {
+    "fields": {
+      "id": "string (uuid)",
+      "name": "string",
+      "category": "string enum ['Yoga','Meditation','Strength','Cardio']",
+      "duration": "number (minutes)",
+      "calories": "number",
+      "difficulty": "string enum ['Beginner','Intermediate','Advanced']",
+      "premium": "boolean",
+      "description": "string",
+      "steps": "string[]"
+    },
+    "seededInCode": true
+  },
+  "fitness_log": {
+    "fields": {
+      "id": "string (uuid)",
+      "userId": "string (indexed)",
+      "workoutId": "string (ref workouts.id)",
+      "year": "number",
+      "week": "number",
+      "day": "string",
+      "duration": "number",
+      "calories": "number",
+      "done": "boolean",
+      "timestamp": "string (ISO-8601)"
+    },
+    "indexes": ["userId + year + week", "day"],
+    "note": "streak = distinct days in current week; focus = total logs that week"
+  }
+}

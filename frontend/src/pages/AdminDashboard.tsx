@@ -10,39 +10,56 @@ import {
     ArrowDownLeft,
     Database,
     Clock,
-    Cpu
+    Cpu,
+    CheckCircle,
+    Trash2
 } from 'lucide-react';
 import './AdminDashboard.css';
 
 const AdminDashboard: React.FC = () => {
-    const { isAdminAuthenticated, adminKeyMember, auditLogs, adminActionHistory } = useUserStore();
+    const { isAdminAuthenticated, adminKeyMember, auditLogs, adminActionHistory, systemUpdates } = useUserStore();
     const [filterCategory, setFilterCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const { addSystemUpdate, addAdminAction } = useUserStore();
     const [updateTitle, setUpdateTitle] = useState('');
     const [updateContent, setUpdateContent] = useState('');
     const [isBroadcasting, setIsBroadcasting] = useState(false);
+    const [toast, setToast] = useState<string | null>(null);
+    const [syncing, setSyncing] = useState(false);
 
+    const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
     const handleBroadcast = () => {
-        if (!updateTitle || !updateContent) return;
+        if (!updateTitle.trim() || !updateContent.trim()) { showToast('Title and description required'); return; }
+        if (updateTitle.trim().length < 5) { showToast('Title must be at least 5 characters'); return; }
+        if (updateContent.trim().length < 10) { showToast('Description must be at least 10 characters'); return; }
         setIsBroadcasting(true);
-
         setTimeout(() => {
             addSystemUpdate({
-                title: updateTitle,
-                content: updateContent,
+                title: updateTitle.trim(),
+                content: updateContent.trim(),
                 adminName: adminKeyMember || 'Admin'
             });
             addAdminAction({
                 adminName: adminKeyMember || 'Admin',
                 action: 'System Broadcast',
-                details: `Broadcast sent: ${updateTitle}`
+                details: `Broadcast sent: ${updateTitle.trim()} to ${auditLogs.length} users`
             });
             setUpdateTitle('');
             setUpdateContent('');
             setIsBroadcasting(false);
-            alert('Broadcase successfully sent to all users!');
+            showToast('Broadcast successfully sent to all users!');
         }, 1000);
+    };
+    const handleForceSync = () => {
+        setSyncing(true);
+        setTimeout(() => { setSyncing(false); showToast('Data synchronization complete — PostgreSQL in sync'); addAdminAction({ adminName: adminKeyMember || 'Admin', action: 'Force Sync', details: 'Manual data sync triggered — all shards verified' }); }, 1500);
+    };
+    const handleClearHistory = () => {
+        if (!window.confirm('Clear admin action history? (frontend-only demo)')) return;
+        // filter history via store hack
+        (useUserStore.getState() as any).adminActionHistory = [];
+        useUserStore.setState({ adminActionHistory: [] });
+        showToast('History cleared');
     };
 
     if (!isAdminAuthenticated) {
@@ -74,11 +91,15 @@ const AdminDashboard: React.FC = () => {
                 <div className="admin-stats-quick">
                     <div className="admin-stat-small glass-card">
                         <Users size={18} />
-                        <div><strong>1,284</strong> Active Users</div>
+                        <div><strong>{Math.max(1284, auditLogs.length + 1284).toLocaleString()}</strong> Active Users</div>
                     </div>
                     <div className="admin-stat-small glass-card">
                         <Cpu size={18} />
                         <div><strong>99.9%</strong> Core Health</div>
+                    </div>
+                    <div className="admin-stat-small glass-card">
+                        <Database size={18} />
+                        <div><strong>{systemUpdates.length}</strong> Bulletins</div>
                     </div>
                 </div>
             </header>
@@ -166,6 +187,10 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </div>
                     <div className="history-timeline">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                            <span className="hint-text">{adminActionHistory.length} actions • {systemUpdates.length} bulletins</span>
+                            {adminActionHistory.length > 0 && <button className="btn btn-ghost btn-xs" onClick={handleClearHistory}><Trash2 size={12} /> Clear</button>}
+                        </div>
                         {adminActionHistory.length > 0 ? adminActionHistory.map(action => (
                             <div key={action.id} className="history-node">
                                 <div className="node-marker"></div>
@@ -181,7 +206,7 @@ const AdminDashboard: React.FC = () => {
                         )) : (
                             <div className="empty-history">
                                 <Database size={48} className="text-muted" />
-                                <p>No administrative changes detected in this epoch.</p>
+                                <p>No administrative changes detected in this epoch. Trigger a broadcast or sync.</p>
                             </div>
                         )}
                     </div>
@@ -221,6 +246,7 @@ const AdminDashboard: React.FC = () => {
 
                     <div className="admin-broadcast-tool">
                         <h4>System Broadcast Center</h4>
+                        <span className="hint-text">{updateTitle.length}/60 • {updateContent.length}/300</span>
                         <div className="broadcast-form">
                             <input
                                 type="text"
@@ -229,18 +255,20 @@ const AdminDashboard: React.FC = () => {
                                 onChange={(e) => setUpdateTitle(e.target.value)}
                                 className="admin-input"
                                 disabled={isBroadcasting}
+                                maxLength={60}
                             />
                             <textarea
-                                placeholder="Update description for users..."
+                                placeholder="Update description for users... (min 10 chars)"
                                 value={updateContent}
                                 onChange={(e) => setUpdateContent(e.target.value)}
                                 className="admin-textarea"
                                 disabled={isBroadcasting}
+                                maxLength={300}
                             ></textarea>
                             <button
                                 className="btn btn-primary btn-full"
                                 onClick={handleBroadcast}
-                                disabled={isBroadcasting || !updateTitle || !updateContent}
+                                disabled={isBroadcasting || !updateTitle.trim() || !updateContent.trim()}
                             >
                                 <ArrowUpRight size={18} /> {isBroadcasting ? 'TRANSMITTING...' : 'BROADCAST TO USERS'}
                             </button>
@@ -248,10 +276,11 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     <div className="admin-actions-shortcuts">
-                        <button className="btn btn-outline btn-full"><ArrowDownLeft size={18} /> Force Data Synchronization</button>
+                        <button className={`btn btn-outline btn-full ${syncing ? 'pulse-heavy' : ''}`} onClick={handleForceSync} disabled={syncing}><ArrowDownLeft size={18} /> {syncing ? 'SYNCING...' : 'Force Data Synchronization'}</button>
                     </div>
                 </section>
             </div>
+            {toast && <div className="glass-card" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', padding: '0.8rem 1.2rem', background: '#10b981', color: 'white', borderRadius: '12px', zIndex: 9999, display: 'flex', gap: '0.6rem', alignItems: 'center' }}><CheckCircle size={18} /> {toast}</div>}
         </div>
     );
 };

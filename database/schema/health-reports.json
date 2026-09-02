@@ -1,0 +1,28 @@
+{
+  "collection": "health_reports",
+  "ownerService": "medical",
+  "description": "AI scan reports & doctor-reviewed records. Payload encrypted AES-256-GCM.",
+  "fields": {
+    "id": "string (uuid)",
+    "userId": "string (indexed)",
+    "date": "string (ISO-8601)",
+    "condition": "string",
+    "symptoms": "string[]",
+    "severity": "string enum ['Low','Medium','High']",
+    "recommendations": "object[] { title, text }",
+    "encrypted": "boolean (true when ciphertext stored)",
+    "createdAt": "string (ISO-8601)"
+  },
+  "example": {
+    "id": "c7a2e111-0000-4000-8000-000000000002",
+    "userId": "b9f1c0d2-0000-4000-8000-000000000001",
+    "date": "2026-01-27T10:30:00.000Z",
+    "condition": "Vata imbalance",
+    "symptoms": ["dry skin", "fatigue"],
+    "severity": "Medium",
+    "recommendations": [{ "title": "Warm oil massage", "text": "Abhyanga twice weekly." }],
+    "encrypted": false,
+    "createdAt": "2026-01-27T10:30:00.000Z"
+  },
+  "indexes": ["userId", "userId + date desc"]
+}

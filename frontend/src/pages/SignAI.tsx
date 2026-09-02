@@ -8,24 +8,35 @@ const SignAI: React.FC = () => {
     const [history, setHistory] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const samples = [
+        "Namaste, I need help with my digestion.",
+        "Where is the Ayurvedic diet plan?",
+        "I want to book a doctor appointment.",
+        "My stomach is paining since morning.",
+        "Show me yoga for stress relief.",
+    ];
+    const [sampleIdx, setSampleIdx] = useState(0);
+
     const startRecording = () => {
         setIsRecording(true);
         setLoading(true);
         setDetectedText("");
-
-        // Simulate AI processing
         setTimeout(() => {
-            const result = "Namaste, I need help with my digestion.";
+            const result = samples[sampleIdx % samples.length];
+            setSampleIdx(i => i + 1);
             setDetectedText(result);
             setHistory(prev => [result, ...prev].slice(0, 5));
             setLoading(false);
             setIsRecording(false);
-
-            // Simulate Speak
-            const utterance = new SpeechSynthesisUtterance(result);
-            window.speechSynthesis.speak(utterance);
-        }, 3000);
+            try {
+                const utterance = new SpeechSynthesisUtterance(result);
+                utterance.lang = 'en-IN';
+                window.speechSynthesis.speak(utterance);
+            } catch { /* ignore */ }
+        }, 2200);
     };
+    const clearHistory = () => setHistory([]);
+    const handleClearOutput = () => { setDetectedText(''); window.speechSynthesis.cancel(); };
 
     return (
         <div className="sign-ai-page container section-padding">
@@ -122,16 +133,20 @@ const SignAI: React.FC = () => {
                     </div>
 
                     <div className="history-card glass-card">
-                        <h5>Recent Interpretations</h5>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h5>Recent Interpretations</h5>
+                            {history.length > 0 && <button className="btn btn-ghost btn-xs" onClick={clearHistory}>Clear</button>}
+                        </div>
                         <div className="history-list">
                             {history.length > 0 ? history.map((h, i) => (
                                 <div key={i} className="history-item">
                                     <Clock size={12} /> {h}
                                 </div>
                             )) : (
-                                <span className="no-history">No history yet</span>
+                                <span className="no-history">No history yet — capture a sign to start</span>
                             )}
                         </div>
+                        {detectedText && <button className="btn btn-outline btn-xs btn-full" onClick={handleClearOutput} style={{ marginTop: '0.6rem' }}>Clear Output</button>}
                     </div>
 
                     <div className="instruction-card glass-card">
