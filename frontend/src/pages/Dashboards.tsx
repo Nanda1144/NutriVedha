@@ -1,10 +1,10 @@
 import React from 'react';
 import { useUserStore } from '../store/userStore';
-import UserDashboard from './UserDashboard';
-import DoctorDashboard from './DoctorDashboard';
-import FarmerDashboard from './FarmerDashboard';
-import TrainerDashboard from './TrainerDashboard';
-import DeliveryDashboard from './DeliveryDashboard';
+import UserDashboard from './user/UserDashboard';
+import DoctorDashboard from './doctor/DoctorDashboard';
+import FarmerDashboard from './farmer/FarmerDashboard';
+import TrainerDashboard from './trainer/TrainerDashboard';
+import DeliveryDashboard from './delivery/DeliveryDashboard';
 import './Dashboards.css';
 
 const DashboardSwitcher: React.FC = () => {

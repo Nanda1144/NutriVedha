@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { db, ok, created, fail, requireAuth, requireRole, getConfig } from '@nutrivedha/shared';
+import { db, ok, created, fail, requireAuth, requireRole, getConfig, normalizeRole } from '@nutrivedha/shared';
 
 const config = getConfig('delivery', 3008);
 
@@ -36,7 +36,7 @@ if (Orders.find().length === 0) {
 
 const router = Router();
 router.use(requireAuth(config.jwtSecret));
-router.use(requireRole('Delivery', 'Admin', 'User'));
+router.use(requireRole('DELIVERY', 'ADMIN', 'USER'));
 
 router.get('/orders', (_req: Request, res: Response) => ok(res, { orders: Orders.find() }));
 
@@ -50,7 +50,7 @@ router.post('/orders', (req: Request, res: Response) => {
     address,
     items,
     status: status ?? 'Pending',
-    assignedTo: req.user?.role === 'Delivery' ? req.user.userId : undefined,
+    assignedTo: normalizeRole((req.user as any)?.role || '') === 'DELIVERY' ? (req.user as any).id || (req.user as any).userId! : undefined,
     createdAt: new Date().toISOString(),
   };
   Orders.insert(order);

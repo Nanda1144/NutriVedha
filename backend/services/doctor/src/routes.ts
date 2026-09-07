@@ -33,7 +33,7 @@ router.use(requireRole('Doctor', 'Admin'));
 
 // GET /api/doctor/profile
 router.get('/profile', (req: Request, res: Response) => {
-  const profile = Profiles.findOne({ userId: req.user!.userId } as Partial<DoctorProfile>);
+  const profile = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<DoctorProfile>);
   if (!profile) return fail(res, 'Doctor profile not found', 404);
   ok(res, { profile });
 });
@@ -42,12 +42,12 @@ router.get('/profile', (req: Request, res: Response) => {
 router.post('/profile', (req: Request, res: Response) => {
   const { name, specialization, regNumber, experience } = req.body ?? {};
   if (!name || !regNumber) return fail(res, 'name and regNumber required');
-  const existing = Profiles.findOne({ userId: req.user!.userId } as Partial<DoctorProfile>);
+  const existing = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<DoctorProfile>);
   if (existing) return fail(res, 'Profile already exists', 409);
 
   const profile: DoctorProfile = {
     id: Profiles.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     name,
     specialization: specialization ?? 'General Ayurveda',
     regNumber,
@@ -69,7 +69,7 @@ router.post('/verify/:id', requireRole('Admin'), (req: Request, res: Response) =
 
 // GET /api/doctor/patients
 router.get('/patients', (req: Request, res: Response) => {
-  const profile = Profiles.findOne({ userId: req.user!.userId } as Partial<DoctorProfile>);
+  const profile = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<DoctorProfile>);
   if (!profile) return fail(res, 'Doctor profile not found', 404);
   ok(res, { patients: Patients.find({ doctorId: profile.id } as Partial<PatientRecord>) });
 });

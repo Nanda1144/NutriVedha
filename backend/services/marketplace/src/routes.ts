@@ -88,7 +88,7 @@ router.post('/prebook', (req: Request, res: Response) => {
 
   const booking: CropBooking = {
     id: Bookings.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     cropId,
     quantity: qty,
     totalPrice: crop.price * qty + FLAT_DELIVERY,
@@ -102,7 +102,7 @@ router.post('/prebook', (req: Request, res: Response) => {
 
 // GET /api/marketplace/bookings
 router.get('/bookings', (req: Request, res: Response) => {
-  const bookings = Bookings.find({ userId: req.user!.userId } as Partial<CropBooking>).map((b) => ({
+  const bookings = Bookings.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<CropBooking>).map((b) => ({
     ...b,
     crop: Crops.findById(b.cropId) ?? null,
   }));

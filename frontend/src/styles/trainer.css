@@ -1,0 +1,97 @@
+/* ============================================
+   NutriVedha — TRAINER APPLICATION DESIGN SYSTEM
+   Premium fitness/wellness • Preserve palette
+   #2d5a27 primary • #a7c957 accent • #1b3a17 dark
+   ============================================ */
+:root{
+  --trainer-primary:#2d5a27;
+  --trainer-dark:#1b3a17;
+  --trainer-accent:#a7c957;
+  --trainer-accent-soft:rgba(167,201,87,0.10);
+  --trainer-accent-mid:rgba(167,201,87,0.16);
+  --trainer-bg:#f8faf7;
+  --trainer-card:#ffffff;
+  --trainer-text:#1e293b;
+  --trainer-muted:#64748b;
+  --trainer-border:#e6ece3;
+  --trainer-radius:16px;
+  --trainer-radius-lg:22px;
+}
+/* Layout */
+.trainer-layout{display:flex; min-height:100vh; background:var(--trainer-bg);}
+.trainer-main{flex:1; min-width:0; display:flex; flex-direction:column;}
+
+/* Hero — energetic fitness gradient */
+.trainer-hero{
+  background: linear-gradient(135deg, #1b3a17 0%, #2d5a27 55%, #3a7a33 100%);
+  color:white;
+  padding:36px 0 42px;
+  position:relative; overflow:hidden;
+}
+.trainer-hero::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(40% 50% at 78% 20%, rgba(167,201,87,0.18), transparent 60%),
+    radial-gradient(30% 40% at 10% 80%, rgba(255,255,255,0.06), transparent 60%);
+  pointer-events:none;
+}
+.trainer-hero__inner{position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 20px; display:grid; grid-template-columns:1.2fr 0.8fr; gap:24px; align-items:center;}
+.trainer-hero h1{color:white; font-size:clamp(1.6rem,3.5vw,2.3rem); line-height:1.05; margin-bottom:8px;}
+.trainer-hero p{color:rgba(255,255,255,0.84); font-size:1.02rem;}
+.trainer-hero__img{width:100%; max-width:360px; border-radius:var(--trainer-radius-lg); box-shadow:0 14px 32px rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.12);}
+
+/* Cards — premium fitness */
+.trainer-card{
+  background:var(--trainer-card);
+  border:1px solid var(--trainer-border);
+  border-radius:var(--trainer-radius);
+  box-shadow:0 2px 12px rgba(15,30,15,0.04);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.trainer-card:hover{transform:translateY(-3px); box-shadow:0 10px 26px rgba(15,30,15,0.09); border-color:rgba(167,201,87,0.22);}
+.trainer-card--accent{border-left:3px solid var(--trainer-accent);}
+
+/* Progress ring */
+.trainer-ring{ --size:84px; width:var(--size); height:var(--size); position:relative; display:grid; place-items:center; }
+.trainer-ring svg{transform:rotate(-90deg);}
+.trainer-ring__val{position:absolute; font-weight:900; color:var(--trainer-dark); font-size:1.05rem;}
+.trainer-ring__label{font-size:0.72rem; font-weight:800; color:var(--trainer-muted); text-transform:uppercase; letter-spacing:0.06em;}
+
+/* Badges */
+.trainer-badge{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-weight:800; font-size:0.72rem; letter-spacing:0.04em; text-transform:uppercase; border:1px solid var(--trainer-border);}
+.trainer-badge--success{background:#ecfdf5; color:#065f46; border-color:#a7f3d0;}
+.trainer-badge--warning{background:#fffbeb; color:#92400e; border-color:#fde68a;}
+.trainer-badge--danger{background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+.trainer-badge--neutral{background:var(--trainer-accent-soft); color:var(--trainer-primary);}
+
+/* Tables */
+.trainer-table{width:100%; border-collapse:separate; border-spacing:0; font-size:0.92rem;}
+.trainer-table th{text-align:left; padding:12px 14px; color:var(--trainer-muted); font-weight:800; font-size:0.76rem; text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid var(--trainer-border); white-space:nowrap;}
+.trainer-table td{padding:12px 14px; border-bottom:1px solid #f0f0ea; vertical-align:middle;}
+.trainer-table tr:last-child td{border-bottom:none;}
+.trainer-table tr:hover td{background:#fdfcf8;}
+
+/* Stagger */
+@keyframes trainerFadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+.trainer-stagger > *{opacity:0; animation:trainerFadeIn 0.42s ease forwards;}
+.trainer-stagger > *:nth-child(1){animation-delay:0.04s} .trainer-stagger > *:nth-child(2){animation-delay:0.10s}
+.trainer-stagger > *:nth-child(3){animation-delay:0.16s} .trainer-stagger > *:nth-child(4){animation-delay:0.22s}
+.trainer-stagger > *:nth-child(5){animation-delay:0.28s} .trainer-stagger > *:nth-child(6){animation-delay:0.34s}
+.trainer-stagger > *:nth-child(7){animation-delay:0.40s} .trainer-stagger > *:nth-child(8){animation-delay:0.46s}
+
+/* Progress chart animation */
+@keyframes trainerBarGrow{from{transform:scaleY(0)} to{transform:scaleY(1)}}
+.trainer-bar{transform-origin:bottom; animation:trainerBarGrow 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+@keyframes trainerRingDraw{from{stroke-dashoffset:283} to{stroke-dashoffset:var(--offset)}}
+
+/* Pulse */
+@keyframes trainerPulse{0%,100%{transform:scale(1); opacity:1} 50%{transform:scale(1.06); opacity:0.85}}
+.trainer-pulse{animation:trainerPulse 1.6s ease-in-out infinite;}
+
+/* Responsive */
+@media(max-width:900px){ .trainer-hero__inner{grid-template-columns:1fr;} .trainer-hero__img{display:none;} }
+@media(max-width:640px){ .trainer-table th, .trainer-table td{padding:10px 8px; font-size:0.84rem;} }
+
+/* A11y */
+.trainer-card:focus-within{outline:2px solid var(--trainer-accent); outline-offset:2px;}

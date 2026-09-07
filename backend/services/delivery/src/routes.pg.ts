@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { db, ok, created, fail, requireAuth, requireRole, getConfig, pgQuery, isPgAvailable, getPool } from '@nutrivedha/shared';
+import { db, ok, created, fail, requireAuth, requireRole, getConfig, pgQuery, isPgAvailable, getPool, normalizeRole } from '@nutrivedha/shared';
 
 const config = getConfig('delivery', 3008);
 interface DeliveryOrder { id: string; orderId: string; customer: string; address: string; items: string; status: 'Pending' | 'In Transit' | 'Out for Delivery' | 'Delivered'; assignedTo?: string; createdAt: string; }
@@ -16,17 +16,17 @@ if (Orders.find().length === 0) {
 async function usePg(): Promise<boolean> { if (!getPool()) return false; return isPgAvailable(); }
 const router = Router();
 router.use(requireAuth(config.jwtSecret));
-router.use(requireRole('Delivery', 'Admin', 'User'));
+router.use(requireRole('DELIVERY', 'ADMIN', 'USER'));
 router.get('/orders', async (req: Request, res: Response) => {
   const search = (req.query.search as string) || '';
   const filterStatus = (req.query.status as string) || '';
   if (await usePg()) {
     try {
       // Microservice isolation: Delivery sees assigned_to = self OR unassigned, Admin sees all, User sees all
-      const isDelivery = req.user!.role === 'Delivery';
+      const isDelivery = normalizeRole((req.user as any).role) === 'DELIVERY';
       let q = `SELECT id, order_id as "orderId", customer, address, items, status, assigned_to as "assignedTo", created_at as "createdAt" FROM delivery_orders WHERE 1=1`;
       const params: any[] = [];
-      if (isDelivery) { q += ` AND (assigned_to IS NULL OR assigned_to = $${params.length + 1})`; params.push(req.user!.userId); }
+      if (isDelivery) { q += ` AND (assigned_to IS NULL OR assigned_to = $${params.length + 1})`; params.push((req.user as any).id || (req.user as any).userId!); }
       if (search) { q += ` AND (order_id ILIKE $${params.length + 1} OR customer ILIKE $${params.length + 1} OR items ILIKE $${params.length + 1})`; params.push(`%${search}%`); }
       if (filterStatus && filterStatus !== 'All') { q += ` AND status = $${params.length + 1}`; params.push(filterStatus); }
       // Server-side search via ILIKE on idx_delivery_orders (order_id, customer)
@@ -44,9 +44,9 @@ router.post('/orders', async (req: Request, res: Response) => {
   const { orderId, customer, address, items, status } = req.body ?? {};
   if (!orderId || !customer) return fail(res, 'orderId and customer required');
   if (await usePg()) {
-    try { const { rows } = await pgQuery(`INSERT INTO delivery_orders (order_id, customer, address, items, status, assigned_to) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, order_id as "orderId", customer, address, items, status, assigned_to as "assignedTo", created_at as "createdAt"`, [orderId, customer, address, items, status ?? 'Pending', req.user?.role === 'Delivery' ? req.user.userId : null]); return created(res, { order: rows[0] }); } catch (e: any) { if (e.code === '23505') return fail(res, 'Order ID already exists', 409); console.error('[delivery-pg] orders POST', e.message); return fail(res, 'Database error', 500); }
+    try { const { rows } = await pgQuery(`INSERT INTO delivery_orders (order_id, customer, address, items, status, assigned_to) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, order_id as "orderId", customer, address, items, status, assigned_to as "assignedTo", created_at as "createdAt"`, [orderId, customer, address, items, status ?? 'Pending', normalizeRole((req.user as any)?.role || '') === 'DELIVERY' ? (req.user as any).id || (req.user as any).userId! : null]); return created(res, { order: rows[0] }); } catch (e: any) { if (e.code === '23505') return fail(res, 'Order ID already exists', 409); console.error('[delivery-pg] orders POST', e.message); return fail(res, 'Database error', 500); }
   }
-  const order: DeliveryOrder = { id: Orders.newId(), orderId, customer, address, items, status: status ?? 'Pending', assignedTo: req.user?.role === 'Delivery' ? req.user.userId : undefined, createdAt: new Date().toISOString() };
+  const order: DeliveryOrder = { id: Orders.newId(), orderId, customer, address, items, status: status ?? 'Pending', assignedTo: normalizeRole((req.user as any)?.role || '') === 'DELIVERY' ? (req.user as any).id || (req.user as any).userId! : undefined, createdAt: new Date().toISOString() };
   Orders.insert(order); return created(res, { order });
 });
 router.put('/orders/:id/status', async (req: Request, res: Response) => {

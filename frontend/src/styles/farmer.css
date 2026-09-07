@@ -1,0 +1,115 @@
+/* ============================================
+   NutriVedha — FARMER APPLICATION DESIGN SYSTEM
+   Premium agriculture + marketplace • Preserve palette
+   #2d5a27 primary • #a7c957 accent • #1b3a17 dark
+   Earthy marketplace with crop timeline + inventory
+   ============================================ */
+:root{
+  --farm-primary:#2d5a27;
+  --farm-dark:#1b3a17;
+  --farm-accent:#a7c957;
+  --farm-accent-soft:rgba(167,201,87,0.10);
+  --farm-accent-mid:rgba(167,201,87,0.16);
+  --farm-earth:#8b5e3c;
+  --farm-bg:#f8faf7;
+  --farm-card:#ffffff;
+  --farm-text:#1e293b;
+  --farm-muted:#64748b;
+  --farm-border:#e6ece3;
+  --farm-radius:16px;
+  --farm-radius-lg:22px;
+}
+/* Layout */
+.farm-layout{display:flex; min-height:100vh; background:var(--farm-bg);}
+.farm-main{flex:1; min-width:0; display:flex; flex-direction:column;}
+
+/* Hero — agriculture gradient */
+.farm-hero{
+  background: linear-gradient(135deg, #1b3a17 0%, #2d5a27 54%, #3f6d2e 100%);
+  color:white;
+  padding:36px 0 42px;
+  position:relative; overflow:hidden;
+}
+.farm-hero::after{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    radial-gradient(38% 48% at 78% 22%, rgba(167,201,87,0.16), transparent 60%),
+    radial-gradient(28% 36% at 12% 78%, rgba(255,255,255,0.06), transparent 60%);
+  pointer-events:none;
+}
+.farm-hero__inner{position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 20px; display:grid; grid-template-columns:1.28fr 0.72fr; gap:24px; align-items:center;}
+.farm-hero h1{color:white; font-size:clamp(1.6rem,3.4vw,2.3rem); line-height:1.05; margin-bottom:8px;}
+.farm-hero p{color:rgba(255,255,255,0.84); font-size:1.02rem;}
+.farm-hero__img{width:100%; max-width:360px; border-radius:var(--farm-radius-lg); box-shadow:0 14px 32px rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.12);}
+
+/* Cards */
+.farm-card{
+  background:var(--farm-card);
+  border:1px solid var(--farm-border);
+  border-radius:var(--farm-radius);
+  box-shadow:0 2px 12px rgba(15,30,15,0.04);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.farm-card:hover{transform:translateY(-3px); box-shadow:0 10px 26px rgba(15,30,15,0.09); border-color:rgba(167,201,87,0.22);}
+
+/* Crop card image zoom */
+.farm-crop-media{overflow:hidden; border-radius:14px; background:#f8fafc;}
+.farm-crop-media img{width:100%; height:100%; object-fit:cover; transition:transform 0.45s ease;}
+.farm-crop-card:hover .farm-crop-media img{transform:scale(1.08);}
+
+/* Badges */
+.farm-badge{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-weight:800; font-size:0.72rem; letter-spacing:0.04em; text-transform:uppercase; border:1px solid var(--farm-border);}
+.farm-badge--success{background:#ecfdf5; color:#065f46; border-color:#a7f3d0;}
+.farm-badge--warning{background:#fffbeb; color:#92400e; border-color:#fde68a;}
+.farm-badge--danger{background:#fef2f2; color:#991b1b; border-color:#fecaca;}
+.farm-badge--neutral{background:var(--farm-accent-soft); color:var(--farm-primary);}
+.farm-badge--earth{background:#fef7ed; color:#92400e; border-color:#fed7aa;}
+
+/* Timeline — crop growth */
+.farm-timeline{display:grid; grid-template-columns:repeat(5,1fr); gap:0; align-items:start; position:relative; padding:18px 0 8px;}
+.farm-timeline::before{content:''; position:absolute; top:34px; left:8%; right:8%; height:3px; background:linear-gradient(90deg, var(--farm-primary) 0%, var(--farm-accent) 60%, #e6ece3 100%); border-radius:999px; opacity:0.9;}
+.farm-step{display:grid; justify-items:center; gap:8px; position:relative; z-index:1;}
+.farm-step__dot{width:16px; height:16px; border-radius:999px; background:#e6ece3; border:3px solid white; box-shadow:0 0 0 2px #e6ece3; transition: all 0.3s ease;}
+.farm-step--done .farm-step__dot{background:var(--farm-primary); box-shadow:0 0 0 2px var(--farm-primary);}
+.farm-step--active .farm-step__dot{background:var(--farm-accent); box-shadow:0 0 0 2px var(--farm-accent), 0 0 14px rgba(167,201,87,0.45); animation: farmPulse 1.6s ease-in-out infinite;}
+.farm-step__label{font-size:0.76rem; font-weight:800; color:var(--farm-muted); text-align:center;}
+.farm-step--done .farm-step__label, .farm-step--active .farm-step__label{color:var(--farm-dark);}
+.farm-step__date{font-size:0.70rem; font-weight:700; color:var(--farm-muted);}
+
+/* Inventory indicators */
+.farm-stock{height:8px; border-radius:999px; background:#e6ece3; overflow:hidden;}
+.farm-stock__fill{height:100%; border-radius:999px; transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);}
+.farm-stock--ok .farm-stock__fill{background:var(--farm-primary);}
+.farm-stock--low .farm-stock__fill{background:#f59e0b;}
+.farm-stock--crit .farm-stock__fill{background:#ef4444;}
+
+/* Tables */
+.farm-table{width:100%; border-collapse:separate; border-spacing:0; font-size:0.92rem;}
+.farm-table th{text-align:left; padding:12px 14px; color:var(--farm-muted); font-weight:800; font-size:0.76rem; text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid var(--farm-border); white-space:nowrap;}
+.farm-table td{padding:12px 14px; border-bottom:1px solid #f0f0ea; vertical-align:middle;}
+.farm-table tr:last-child td{border-bottom:none;}
+.farm-table tr:hover td{background:#fdfcf8;}
+
+/* Animations */
+@keyframes farmFadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+.farm-stagger > *{opacity:0; animation:farmFadeIn 0.42s ease forwards;}
+.farm-stagger > *:nth-child(1){animation-delay:0.04s} .farm-stagger > *:nth-child(2){animation-delay:0.10s}
+.farm-stagger > *:nth-child(3){animation-delay:0.16s} .farm-stagger > *:nth-child(4){animation-delay:0.22s}
+.farm-stagger > *:nth-child(5){animation-delay:0.28s} .farm-stagger > *:nth-child(6){animation-delay:0.34s}
+.farm-stagger > *:nth-child(7){animation-delay:0.40s} .farm-stagger > *:nth-child(8){animation-delay:0.46s}
+
+@keyframes farmGrowth{from{height:0; opacity:0} to{height:100%; opacity:1}}
+.farm-growth-bar{transform-origin:bottom; animation: farmGrowth 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+
+@keyframes farmPulse{0%,100%{transform:scale(1); opacity:1} 50%{transform:scale(1.12); opacity:0.85}}
+.farm-pulse{animation:farmPulse 1.6s ease-in-out infinite;}
+
+@keyframes farmZoomIn{from{transform:scale(1)} to{transform:scale(1.06)}}
+
+/* Responsive */
+@media(max-width:900px){ .farm-hero__inner{grid-template-columns:1fr;} .farm-hero__img{display:none;} .farm-timeline{grid-template-columns:repeat(5,1fr); gap:4px;} .farm-timeline::before{left:6%; right:6%;}}
+@media(max-width:640px){ .farm-table th, .farm-table td{padding:10px 8px; font-size:0.84rem;} .farm-timeline{overflow-x:auto; padding-bottom:12px;}}
+
+/* A11y */
+.farm-card:focus-within{outline:2px solid var(--farm-accent); outline-offset:2px;}

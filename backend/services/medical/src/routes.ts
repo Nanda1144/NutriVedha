@@ -26,7 +26,7 @@ router.post('/reports', (req: Request, res: Response) => {
   const payload = JSON.stringify({ condition, symptoms, severity, recommendations, imageData: imageData ?? null });
   const report: MedicalReport = {
     id: Reports.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
     encryptedData: encrypt(payload, SECRET),
     createdAt: new Date().toISOString(),
@@ -37,7 +37,7 @@ router.post('/reports', (req: Request, res: Response) => {
 
 // GET /api/medical/reports  - list user's reports (decrypted on read)
 router.get('/reports', (req: Request, res: Response) => {
-  const list = Reports.find({ userId: req.user!.userId } as Partial<MedicalReport>).map((r) => ({
+  const list = Reports.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<MedicalReport>).map((r) => ({
     id: r.id,
     date: r.date,
     ...JSON.parse(decrypt(r.encryptedData, SECRET)),
@@ -48,14 +48,14 @@ router.get('/reports', (req: Request, res: Response) => {
 // GET /api/medical/reports/:id
 router.get('/reports/:id', (req: Request, res: Response) => {
   const r = Reports.findById(req.params.id);
-  if (!r || r.userId !== req.user!.userId) return fail(res, 'Report not found', 404);
+  if (!r || r.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Report not found', 404);
   return ok(res, { report: { id: r.id, date: r.date, ...JSON.parse(decrypt(r.encryptedData, SECRET)) } });
 });
 
 // DELETE /api/medical/reports/:id
 router.delete('/reports/:id', (req: Request, res: Response) => {
   const r = Reports.findById(req.params.id);
-  if (!r || r.userId !== req.user!.userId) return fail(res, 'Report not found', 404);
+  if (!r || r.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Report not found', 404);
   Reports.remove(r.id);
   return ok(res, { message: 'Report deleted' });
 });

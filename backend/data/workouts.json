@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Sun Salutation Flow",
+    "category": "Yoga",
+    "duration": 15,
+    "calories": 85,
+    "difficulty": "Beginner",
+    "premium": false,
+    "description": "Classic Surya Namaskar sequence.",
+    "steps": [
+      "Mountain pose",
+      "Forward fold",
+      "Plank",
+      "Cobra",
+      "Downward dog"
+    ],
+    "id": "5732180d-3763-4ea4-a7e7-bd47e5c392c0"
+  },
+  {
+    "name": "Pranayama Breathing",
+    "category": "Meditation",
+    "duration": 10,
+    "calories": 30,
+    "difficulty": "Beginner",
+    "premium": false,
+    "description": "Anulom Vilom + Bhramari.",
+    "steps": [
+      "Sit comfortably",
+      "Alternate nostril breathing",
+      "Humming breath"
+    ],
+    "id": "dd440efc-3295-404a-85d7-289d57c32838"
+  },
+  {
+    "name": "Ayurvedic Core Burn",
+    "category": "Strength",
+    "duration": 25,
+    "calories": 210,
+    "difficulty": "Intermediate",
+    "premium": true,
+    "description": "Core focused HIIT.",
+    "steps": [
+      "Plank holds",
+      "Russian twists",
+      "Leg raises",
+      "Mountain climbers"
+    ],
+    "id": "f5831770-8d24-426f-8eb4-e7105ca69f05"
+  }
+]

@@ -10,13 +10,32 @@ export const API_BASE: string =
 
 const TOKEN_KEY = 'nv_token';
 
+// Access token in controlled client memory (per spec 13) — not localStorage persistent for refresh
+// We keep localStorage as fallback for page reload before refresh cookie flow is fully adopted
+let memoryToken: string | null = null;
+
 export function setAuthToken(token: string | null): void {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+  memoryToken = token;
+  // For backward compat, also mirror to localStorage but refresh token NEVER goes here
+  if (token) {
+    try { localStorage.setItem(TOKEN_KEY, token); } catch {}
+  } else {
+    try { localStorage.removeItem(TOKEN_KEY); } catch {}
+  }
 }
 
 export function getAuthToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  if (memoryToken) return memoryToken;
+  try {
+    const ls = localStorage.getItem(TOKEN_KEY);
+    if (ls) memoryToken = ls;
+    return ls;
+  } catch { return memoryToken; }
+}
+
+export function clearAuthToken(): void {
+  memoryToken = null;
+  try { localStorage.removeItem(TOKEN_KEY); } catch {}
 }
 
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -25,7 +44,7 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
   const token = getAuthToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
 
-  const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...init, headers, credentials: 'include' as RequestCredentials });
 
   if (!res.ok) {
     let message = res.statusText || `Request failed (${res.status})`;

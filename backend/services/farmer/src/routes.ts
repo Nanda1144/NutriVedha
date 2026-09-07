@@ -41,7 +41,7 @@ router.use(requireRole('Farmer', 'Admin'));
 
 // Animals
 router.get('/livestock', (req: Request, res: Response) => {
-  ok(res, { livestock: LivestockDb.find({ userId: req.user!.userId } as Partial<Livestock>) });
+  ok(res, { livestock: LivestockDb.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<Livestock>) });
 });
 
 router.post('/livestock', (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ router.post('/livestock', (req: Request, res: Response) => {
   if (!name || !type) return fail(res, 'name and type required');
   const animal: Livestock = {
     id: LivestockDb.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     name,
     type,
     breed: breed ?? '',
@@ -62,14 +62,14 @@ router.post('/livestock', (req: Request, res: Response) => {
 
 router.put('/livestock/:id', (req: Request, res: Response) => {
   const animal = LivestockDb.findById(req.params.id);
-  if (!animal || animal.userId !== req.user!.userId) return fail(res, 'Animal not found', 404);
+  if (!animal || animal.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Animal not found', 404);
   LivestockDb.update(animal.id, req.body ?? {});
   ok(res, { animal: LivestockDb.findById(animal.id) });
 });
 
 // Earnings
 router.get('/earnings', (req: Request, res: Response) => {
-  const earnings = Earnings.find({ userId: req.user!.userId } as Partial<Earning>);
+  const earnings = Earnings.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<Earning>);
   const total = earnings.reduce((s, e) => s + (e.amount || 0), 0);
   ok(res, { earnings, total });
 });
@@ -77,14 +77,14 @@ router.get('/earnings', (req: Request, res: Response) => {
 router.post('/earnings', (req: Request, res: Response) => {
   const { month, amount, source } = req.body ?? {};
   if (!month || !amount) return fail(res, 'month and amount required');
-  const earning: Earning = { id: Earnings.newId(), userId: req.user!.userId, month, amount: parseFloat(amount), source: source ?? 'Marketplace' };
+  const earning: Earning = { id: Earnings.newId(), userId: (req.user as any).id || (req.user as any).userId!, month, amount: parseFloat(amount), source: source ?? 'Marketplace' };
   Earnings.insert(earning);
   return created(res, { earning });
 });
 
 // Inventory
 router.get('/inventory', (req: Request, res: Response) => {
-  ok(res, { inventory: Inventory.find({ userId: req.user!.userId } as Partial<InventoryItem>) });
+  ok(res, { inventory: Inventory.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<InventoryItem>) });
 });
 
 router.post('/inventory', (req: Request, res: Response) => {
@@ -92,7 +92,7 @@ router.post('/inventory', (req: Request, res: Response) => {
   if (!name || price === undefined) return fail(res, 'name and price required');
   const item: InventoryItem = {
     id: Inventory.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     name,
     stock: parseInt(stock, 10) || 0,
     unit: unit ?? 'kg',
@@ -104,7 +104,7 @@ router.post('/inventory', (req: Request, res: Response) => {
 
 router.patch('/inventory/:id', (req: Request, res: Response) => {
   const item = Inventory.findById(req.params.id);
-  if (!item || item.userId !== req.user!.userId) return fail(res, 'Item not found', 404);
+  if (!item || item.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Item not found', 404);
   Inventory.update(item.id, req.body ?? {});
   ok(res, { item: Inventory.findById(item.id) });
 });

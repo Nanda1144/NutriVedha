@@ -22,7 +22,7 @@ router.use(requireAuth(config.jwtSecret));
 
 // GET /api/notification
 router.get('/', (req: Request, res: Response) => {
-  const notifs = Notifs.find({ userId: req.user!.userId } as Partial<Notif>)
+  const notifs = Notifs.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<Notif>)
     .sort((a, b) => (a.sentAt < b.sentAt ? 1 : -1))
     .slice(0, 50);
   const unread = notifs.filter((n) => !n.read).length;
@@ -35,7 +35,7 @@ router.post('/send', (req: Request, res: Response) => {
   if (!title || !message) return fail(res, 'title and message required');
   const notif: Notif = {
     id: Notifs.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     title,
     message,
     type: type ?? 'health',
@@ -73,14 +73,14 @@ router.post('/broadcast', (req: Request, res: Response) => {
 // POST /api/notification/:id/read
 router.post('/:id/read', (req: Request, res: Response) => {
   const notif = Notifs.findById(req.params.id);
-  if (!notif || notif.userId !== req.user!.userId) return fail(res, 'Notification not found', 404);
+  if (!notif || notif.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Notification not found', 404);
   Notifs.update(notif.id, { read: true });
   ok(res, { notification: Notifs.findById(notif.id) });
 });
 
 // POST /api/notification/clear
 router.post('/clear', (req: Request, res: Response) => {
-  Notifs.remove({ userId: req.user!.userId } as Partial<Notif>);
+  Notifs.remove({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<Notif>);
   ok(res, { message: 'Notifications cleared' });
 });
 

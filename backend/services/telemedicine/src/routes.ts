@@ -58,7 +58,7 @@ router.post('/appointments', (req: Request, res: Response) => {
 
   const appt: Appointment = {
     id: Appointments.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     doctorId,
     date,
     time,
@@ -72,13 +72,13 @@ router.post('/appointments', (req: Request, res: Response) => {
 
 // GET /api/telemedicine/appointments
 router.get('/appointments', (req: Request, res: Response) => {
-  ok(res, { appointments: Appointments.find({ userId: req.user!.userId } as Partial<Appointment>) });
+  ok(res, { appointments: Appointments.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<Appointment>) });
 });
 
 // POST /api/telemedicine/appointments/:id/cancel
 router.post('/appointments/:id/cancel', (req: Request, res: Response) => {
   const appt = Appointments.findById(req.params.id);
-  if (!appt || appt.userId !== req.user!.userId) return fail(res, 'Appointment not found', 404);
+  if (!appt || appt.userId !== (req.user as any).id || (req.user as any).userId!) return fail(res, 'Appointment not found', 404);
   Appointments.update(appt.id, { status: 'Cancelled' });
   ok(res, { message: 'Appointment cancelled' });
 });

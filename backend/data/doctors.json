@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Dr. Ananya Sharma",
+    "specialization": "Ayurvedic Internal Medicine",
+    "experience": "12+ Years",
+    "rating": 4.8,
+    "reviews": 124,
+    "status": "Available",
+    "fee": 500,
+    "id": "cb6afa36-c963-46b8-9b20-48850a138b2a",
+    "photo": "https://i.pravatar.cc/150?img=12"
+  },
+  {
+    "name": "Dr. Vikram Mehra",
+    "specialization": "Ayurvedic Skin Specialist",
+    "experience": "8+ Years",
+    "rating": 4.9,
+    "reviews": 86,
+    "status": "In Call",
+    "fee": 800,
+    "id": "c26e7cfb-fd2b-4acd-a2f6-cf7c2e27c5cb",
+    "photo": "https://i.pravatar.cc/150?img=13"
+  },
+  {
+    "name": "Dr. Priya Iyer",
+    "specialization": "Nutrition & Dietetics",
+    "experience": "10+ Years",
+    "rating": 4.7,
+    "reviews": 210,
+    "status": "Available",
+    "fee": 600,
+    "id": "3ae5f1ef-c290-445a-9bce-222c67196ee6",
+    "photo": "https://i.pravatar.cc/150?img=14"
+  },
+  {
+    "name": "Dr. Sanjay Gupta",
+    "specialization": "Stress Management",
+    "experience": "15+ Years",
+    "rating": 5,
+    "reviews": 340,
+    "status": "Available",
+    "fee": 1000,
+    "id": "31a9b6ca-158a-433d-aa7d-66c958e16d32",
+    "photo": "https://i.pravatar.cc/150?img=15"
+  }
+]

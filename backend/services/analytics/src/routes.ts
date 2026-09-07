@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { db, ok, created, fail, requireAuth, requireRole, getConfig } from '@nutrivedha/shared';
+import { db, ok, created, fail, requireAuth, requireRole, getConfig, normalizeRole } from '@nutrivedha/shared';
 
 const config = getConfig('analytics', 3011);
 
@@ -34,10 +34,10 @@ const router = Router();
 
 // GET /api/analytics/audit (self) or all (admin)
 router.get('/audit', requireAuth(config.jwtSecret), (req: Request, res: Response) => {
-  const isAdmin = req.user!.role === 'Admin';
+  const isAdmin = normalizeRole((req.user as any).role) === 'ADMIN';
   const logs = (isAdmin
     ? Audit.find()
-    : Audit.find({ userId: req.user!.userId } as Partial<AuditLog>)
+    : Audit.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<AuditLog>)
   ).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, 100);
   ok(res, { logs });
 });
@@ -62,11 +62,11 @@ router.post('/log', (req: Request, res: Response) => {
 // GET /api/analytics/activity
 router.get('/activity', requireAuth(config.jwtSecret), (req: Request, res: Response) => {
   const limit = Math.min(50, parseInt(req.query.limit as string, 10) || 30);
-  const events = Activity.find({ userId: req.user!.userId } as Partial<ActivityEvent>)
+  const events = Activity.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<ActivityEvent>)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, limit);
   const byEvent: Record<string, number> = {};
-  for (const e of Activity.find({ userId: req.user!.userId } as Partial<ActivityEvent>)) byEvent[e.event] = (byEvent[e.event] ?? 0) + 1;
+  for (const e of Activity.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<ActivityEvent>)) byEvent[e.event] = (byEvent[e.event] ?? 0) + 1;
   ok(res, { events, summary: byEvent });
 });
 
@@ -74,13 +74,13 @@ router.get('/activity', requireAuth(config.jwtSecret), (req: Request, res: Respo
 router.post('/activity', requireAuth(config.jwtSecret), (req: Request, res: Response) => {
   const { event } = req.body ?? {};
   if (!event) return fail(res, 'event required');
-  const entry: ActivityEvent = { id: Activity.newId(), userId: req.user!.userId, event, createdAt: new Date().toISOString() };
+  const entry: ActivityEvent = { id: Activity.newId(), userId: (req.user as any).id || (req.user as any).userId!, event, createdAt: new Date().toISOString() };
   Activity.insert(entry);
   return created(res, { event: entry });
 });
 
 // GET /api/analytics/admin/overview
-router.get('/admin/overview', requireAuth(config.jwtSecret), requireRole('Admin'), (_req: Request, res: Response) => ok(res, {
+router.get('/admin/overview', requireAuth(config.jwtSecret), requireRole('ADMIN'), (_req: Request, res: Response) => ok(res, {
   totalUsers: Audit.find().length > 0 ? Activity.find().length : 0,
   events: Activity.find().length,
   auditEntries: Audit.find().length,

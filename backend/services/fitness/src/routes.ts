@@ -61,7 +61,7 @@ router.post('/log', (req: Request, res: Response) => {
 
   const entry: UserFitness = {
     id: FitnessLog.newId(),
-    userId: req.user!.userId,
+    userId: (req.user as any).id || (req.user as any).userId!,
     workoutId,
     year: parseInt(year, 10),
     week: parseInt(week, 10),
@@ -77,7 +77,7 @@ router.post('/log', (req: Request, res: Response) => {
 
 // GET /api/fitness/log   (returns { logs, focus, streak })
 router.get('/log', (req: Request, res: Response) => {
-  const logs = FitnessLog.find({ userId: req.user!.userId, year: parseInt(req.query.year as string, 10), week: parseInt(req.query.week as string, 10) } as Partial<UserFitness>);
+  const logs = FitnessLog.find({ userId: (req.user as any).id || (req.user as any).userId!, year: parseInt(req.query.year as string, 10), week: parseInt(req.query.week as string, 10) } as Partial<UserFitness>);
   const doneDays = new Set(logs.map((l) => l.day));
   const focus = logs.length;
   const done = doneDays.size;
@@ -88,13 +88,13 @@ router.get('/log', (req: Request, res: Response) => {
 
 // POST /api/fitness/log/clear
 router.post('/log/clear', (req: Request, res: Response) => {
-  FitnessLog.remove({ userId: req.user!.userId } as Partial<UserFitness>);
+  FitnessLog.remove({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<UserFitness>);
   ok(res, { message: 'Fitness log cleared' });
 });
 
 // GET /api/fitness/analytics
 router.get('/analytics', (req: Request, res: Response) => {
-  const logs = FitnessLog.find({ userId: req.user!.userId } as Partial<UserFitness>);
+  const logs = FitnessLog.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<UserFitness>);
   const totalCalories = logs.reduce((s, l) => s + (l.calories || 0), 0);
   const totalMinutes = logs.reduce((s, l) => s + (l.duration || 0), 0);
   const days = new Set(logs.map((l) => l.timestamp.slice(0, 10))).size;

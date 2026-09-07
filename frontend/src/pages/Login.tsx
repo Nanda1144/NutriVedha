@@ -11,8 +11,8 @@ const Login: React.FC = () => {
     const [selectedRole, setSelectedRole] = useState<'User' | 'Doctor' | 'Trainer' | 'Farmer' | 'Delivery' | 'Admin'>('User');
     const { setRole, setAdminAuthenticated, updateProfile } = useUserStore();
     const navigate = useNavigate();
-    const [email, setEmail] = useState('pavan@ayurai.health');
-    const [password, setPassword] = useState('password123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
@@ -51,13 +51,18 @@ const Login: React.FC = () => {
                 try {
                     const res = await verifyOtp(phone, otp, email || 'Mobile User');
                     setAuthToken(res.token);
-                    setRole((res.user.role as any) || selectedRole);
-                    updateProfile({ name: res.user.name, email: res.user.email, role: res.user.role as any });
-                    navigate('/dashboard');
+                    const r = (res.user.role as any) || selectedRole;
+                    setRole(r);
+                    updateProfile({ name: res.user.name, email: res.user.email, role: r });
+                    if (r === 'User') navigate('/user/dashboard');
+                    else if (r === 'Doctor') navigate('/doctor/dashboard');
+                    else if (r === 'Admin') { setAdminAuthenticated(true, res.user.name); navigate('/admin/dashboard'); }
+                    else navigate('/dashboard');
                     return;
-                } catch { /* fallback to mock */ }
-                if (selectedRole === 'Admin') { setAdminAuthenticated(true, 'Master Admin'); navigate('/admin-control'); } else { setRole(selectedRole as any); navigate('/'); }
-                return;
+                } catch (e: any) {
+                    setError(e.message || 'OTP verification failed');
+                    return;
+                }
             }
             // email flow: try gateway → fallback to mock
             try {
@@ -70,23 +75,19 @@ const Login: React.FC = () => {
                     } else throw loginErr;
                 }
                 setAuthToken(res.token);
-                setRole((res.user.role as any) || selectedRole);
-                updateProfile({ name: res.user.name, email: res.user.email, role: res.user.role as any });
-                if (res.user.role === 'Admin' || selectedRole === 'Admin') {
+                const r = (res.user.role as any) || selectedRole;
+                setRole(r);
+                updateProfile({ name: res.user.name, email: res.user.email, role: r });
+                if (r === 'Admin' || selectedRole === 'Admin') {
                     setAdminAuthenticated(true, res.user.name);
                     navigate('/admin-control');
-                } else navigate('/dashboard');
+                } else if (r === 'User') navigate('/user/dashboard');
+                else if (r === 'Doctor') navigate('/doctor/dashboard');
+                else navigate('/dashboard');
                 return;
             } catch (err: any) {
-                // gateway unreachable → fallback mock for frontend-first demo
-                console.warn('[Login] gateway unreachable, falling back to mock:', err.message);
-            }
-            if (selectedRole === 'Admin') {
-                setAdminAuthenticated(true, 'Master Admin');
-                navigate('/admin-control');
-            } else {
-                setRole(selectedRole as any);
-                navigate('/');
+                setError(err.message || 'Login failed — backend unreachable');
+                return;
             }
         } finally { setLoading(false); }
     };

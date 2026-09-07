@@ -7,10 +7,8 @@ import './Chatbot.css';
 const Chatbot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState('');
-    const { chatHistory, addChatMessage, setAdminAuthenticated, addAdminAction, isAdminAuthenticated } = useUserStore();
+    const { chatHistory, addChatMessage, addAdminAction, isAdminAuthenticated } = useUserStore();
     const scrollRef = useRef<HTMLDivElement>(null);
-
-    const passkeys = ['@cC1411441', 'pavan', 'manil', 'jyo', 'janu'];
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -18,59 +16,57 @@ const Chatbot: React.FC = () => {
         }
     }, [chatHistory, isOpen]);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!input.trim()) return;
 
         const userMsg = input.trim();
         addChatMessage({ role: 'user', content: userMsg });
         setInput('');
 
-        // Check for Passkeys
-        if (passkeys.some(key => userMsg.toLowerCase().includes(key.toLowerCase()))) {
-            const matchedKey = passkeys.find(key => userMsg.toLowerCase().includes(key.toLowerCase()));
-            setAdminAuthenticated(true, matchedKey!);
-            addAdminAction({
-                adminName: matchedKey!,
-                action: 'Admin Login',
-                details: `Admin access granted via passkey: ${matchedKey}`
-            });
-
-            setTimeout(() => {
-                addChatMessage({
-                    role: 'assistant',
-                    content: `System Protocol Activated. Welcome, Admin ${matchedKey}. The Super Admin Dashboard is now accessible in your sidebar navigation.`
+        // Admin passkey — must be verified via backend, never hardcoded success
+        // We do NOT check passkeys in frontend; we send to backend for verification
+        // For UX, if message looks like a passkey attempt, try backend
+        const maybePasskey = userMsg.trim();
+        if (maybePasskey.length >= 3 && maybePasskey.length <= 20) {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'}/auth/passkey`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passkey: maybePasskey }),
+                    credentials: 'include',
                 });
-            }, 500);
-            return;
+                const data = await res.json();
+                if (res.ok && data.token) {
+                    const { setAuthToken } = await import('../services/client');
+                    setAuthToken(data.token);
+                    const role = data.user?.role || 'ADMIN';
+                    const { useUserStore } = await import('../store/userStore');
+                    // For admin, setAdminAuthenticated via backend-verified identity only
+                    if (role === 'ADMIN' || role === 'Admin') {
+                        const store = useUserStore.getState();
+                        store.setAdminAuthenticated(true, data.passkeyIdentity || data.user?.name || 'Admin');
+                        addAdminAction({
+                            adminName: data.passkeyIdentity || 'Admin',
+                            action: 'Admin Login',
+                            details: `Admin access granted via backend passkey verification`,
+                        });
+                        setTimeout(() => {
+                            addChatMessage({
+                                role: 'assistant',
+                                content: `System Protocol Activated via backend verification. Welcome, Admin. The Super Admin Dashboard is now accessible.`,
+                            });
+                        }, 500);
+                        return;
+                    }
+                }
+            } catch {}
+            // If not a valid passkey, fall through to normal knowledge base
         }
 
         // Knowledge Base Response Logic
         setTimeout(() => {
             let response = "I'm analyzing your request. Can you tell me more about your health goals?";
             const msg = userMsg.toLowerCase().trim();
-
-            // Check for Passkeys inside the timeout too for consistent feedback
-            const foundKey = passkeys.find(key => msg.includes(key.toLowerCase()));
-            if (foundKey) {
-                setAdminAuthenticated(true, foundKey);
-                addAdminAction({
-                    adminName: foundKey,
-                    action: 'Admin Login',
-                    details: `Super Admin session initialized via Chatbot passkey: ${foundKey}`
-                });
-
-                const response = `PROTOCOL ACCEPTED. Welcome back, Admin ${foundKey}. I have unlocked the Super Admin Dashboard for you.`;
-                addChatMessage({ role: 'assistant', content: response });
-
-                // Add a special message with a button
-                setTimeout(() => {
-                    addChatMessage({
-                        role: 'assistant',
-                        content: `You can access the control panel via the sidebar or by clicking the button below.`,
-                    });
-                }, 500);
-                return;
-            }
 
             if (msg.includes('diet') || msg.includes('food')) {
                 response = "AyurAI offers a personalized Diet module. We analyze your body type (Prakriti) and current health state to recommend specific Ayurvedic foods. You can also explore our Food Intelligence Hub for 100+ superfood insights.";

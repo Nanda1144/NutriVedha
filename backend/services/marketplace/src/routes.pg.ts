@@ -85,24 +85,24 @@ router.post('/prebook', async (req: Request, res: Response) => {
       if (!rows[0]) return fail(res, 'Crop not found', 404);
       const crop = rows[0] as any;
       const totalPrice = crop.price * qty + FLAT_DELIVERY;
-      const { rows: b } = await pgQuery(`INSERT INTO crop_bookings (user_id, crop_id, quantity, total_price, status, order_date, payment_intent_id) VALUES ($1,$2,$3,$4,'Growing',$5,$6) RETURNING id, user_id as "userId", crop_id as "cropId", quantity, total_price as "totalPrice", status, order_date as "orderDate", payment_intent_id as "paymentIntentId"`, [req.user!.userId, cropId, qty, totalPrice, new Date().toLocaleDateString(), `pi_sim_${Math.random().toString(36).slice(2, 10)}`]);
+      const { rows: b } = await pgQuery(`INSERT INTO crop_bookings (user_id, crop_id, quantity, total_price, status, order_date, payment_intent_id) VALUES ($1,$2,$3,$4,'Growing',$5,$6) RETURNING id, user_id as "userId", crop_id as "cropId", quantity, total_price as "totalPrice", status, order_date as "orderDate", payment_intent_id as "paymentIntentId"`, [(req.user as any).id || (req.user as any).userId!, cropId, qty, totalPrice, new Date().toLocaleDateString(), `pi_sim_${Math.random().toString(36).slice(2, 10)}`]);
       return created(res, { booking: b[0], savings: (crop.marketPrice - crop.price) * qty });
     } catch (e: any) { console.error('[marketplace-pg] prebook', e.message); return fail(res, 'Database error', 500); }
   }
   const crop = Crops.findById(cropId as string);
   if (!crop) return fail(res, 'Crop not found', 404);
-  const booking: CropBooking = { id: Bookings.newId(), userId: req.user!.userId, cropId, quantity: qty, totalPrice: crop.price * qty + FLAT_DELIVERY, status: 'Growing', orderDate: new Date().toLocaleDateString(), paymentIntentId: `pi_sim_${Bookings.newId().slice(0, 8)}` };
+  const booking: CropBooking = { id: Bookings.newId(), userId: (req.user as any).id || (req.user as any).userId!, cropId, quantity: qty, totalPrice: crop.price * qty + FLAT_DELIVERY, status: 'Growing', orderDate: new Date().toLocaleDateString(), paymentIntentId: `pi_sim_${Bookings.newId().slice(0, 8)}` };
   Bookings.insert(booking);
   return created(res, { booking, savings: (crop.marketPrice - crop.price) * qty });
 });
 router.get('/bookings', async (req: Request, res: Response) => {
   if (await usePg()) {
     try {
-      const { rows } = await pgQuery(`SELECT b.id, b.user_id as "userId", b.crop_id as "cropId", b.quantity, b.total_price as "totalPrice", b.status, b.order_date as "orderDate", b.payment_intent_id as "paymentIntentId", to_jsonb(c) as crop FROM crop_bookings b JOIN crops c ON c.id=b.crop_id WHERE b.user_id=$1 ORDER BY b.created_at DESC`, [req.user!.userId]);
+      const { rows } = await pgQuery(`SELECT b.id, b.user_id as "userId", b.crop_id as "cropId", b.quantity, b.total_price as "totalPrice", b.status, b.order_date as "orderDate", b.payment_intent_id as "paymentIntentId", to_jsonb(c) as crop FROM crop_bookings b JOIN crops c ON c.id=b.crop_id WHERE b.user_id=$1 ORDER BY b.created_at DESC`, [(req.user as any).id || (req.user as any).userId!]);
       return ok(res, { bookings: rows });
     } catch (e: any) { console.error('[marketplace-pg] bookings', e.message); return fail(res, 'Database error', 500); }
   }
-  const bookings = Bookings.find({ userId: req.user!.userId } as Partial<CropBooking>).map((b) => ({ ...b, crop: Crops.findById(b.cropId) ?? null }));
+  const bookings = Bookings.find({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<CropBooking>).map((b) => ({ ...b, crop: Crops.findById(b.cropId) ?? null }));
   return ok(res, { bookings });
 });
 router.put('/bookings/:id/status', async (req: Request, res: Response) => {

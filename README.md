@@ -22,6 +22,7 @@ NutriVedha is a professional-grade HealthTech platform that unifies **Ayurveda**
 12. [.env File Details & Purpose](#12-env-file-details--purpose)
 13. [Challenges We Are Facing Now](#13-challenges-we-are-facing-now)
 14. [Conclusion](#14-conclusion)
+14C. [Frontend Merge & Deduplication](#14c-frontend-merge--deduplication--detailed-changes-2026-09)
 15. [Role-Based Frontend Architecture](#15-role-based-frontend-architecture)
 16. [Feature-Role Matrix](#16-feature-role-matrix)
 17. [User Frontend](#17-user-frontend)
@@ -656,7 +657,157 @@ The foundation is now solid. The immediate next step is **wiring remaining chat/
 
 ---
 
+## 14A. Entry Point (Where to Start)
+
+**For a visitor / evaluator → `Main_interface` is the ONLY entry point.**
+- `Main_interface/` is a standalone Vite app (public website). It owns the 7 public routes: `/`, `/about`, `/services`, `/developers`, `/contact`, `/login`, `/signup` (`Main_interface/src/App.tsx:6`). Logo + favicon = `Main_interface/public/logo.jpeg` (from `public assests/Main_Nutrivedha_logo.jpeg`).
+- `frontend/` is NOT for visitors — it is the authenticated role-based app (23 routes, 6 dashboards) behind `PrivateRoute`.
+- Backend entry for all data is `backend/gateway :8080` — every frontend talks to `http://localhost:8080/api` (see `frontend/src/services/client.ts:8` and `Main_interface/src/services/client.ts:1`).
+
+**Run order for a full demo:** PostgreSQL -> `backend` (gateway+14 services) -> `Main_interface` (public) -> `frontend` (app). See Section 9.
+
+## 14B. Deployment — Vercel (Frontend) + AWS (Full Stack)
+
+> **Vercel = static frontends only.** Backend microservices + Postgres cannot run on Vercel. Deploy frontends on Vercel and the backend on AWS/Railway/Render. Full production is on AWS.
+
+### Vercel — `Main_interface` (public) and `frontend` (app) as 2 projects
+
+1. Push to GitHub (`main` branch). In Vercel Dashboard: **Add New Project -> Import NutriVedha**.
+2. **Project 1 — Main_interface (public):**
+   - Root Directory: `Main_interface`
+   - Framework Preset: `Vite` | Build Command: `npm run build` | Output Directory: `dist`
+   - Node: `22.x` | Install: `npm install`
+   - Env (add in Vercel Settings): `VITE_API_BASE_URL=https://api.nutrivedha.com/api` (your gateway URL), `VITE_APP_ENV=production`
+   - Domain: `nutrivedha.com` / `www.nutrivedha.com` -> point to this project. The 7 pages are static + SPA fallback: Vercel `rewrites = [{source:"/(.*)", destination:"/index.html"}]` (auto for Vite).
+3. **Project 2 — Frontend (app):**
+   - Root Directory: `frontend`
+   - Same Vite settings, output `dist`
+   - Env: same `VITE_API_BASE_URL`, plus `VITE_GEMINI_API_KEY` if you use live AI
+   - Domain: `app.nutrivedha.com` (or `app.nutrivedha.vercel.app`)
+4. Vercel `vercel.json` (optional, already handled by Vite): set `cleanUrls:true`.
+5. No `.env` is committed — add it in Vercel. Never expose `VITE_AUTH_JWT_SECRET` or `VITE_MEDICAL_ENCRYPTION_KEY` to the frontend — keep them only on the backend (AWS Secrets Manager).
+
+### AWS — Full Architecture (14 microservices + gateway + Postgres)
+
+```
+Internet -> Route53 nutrivedha.com / api.nutrivedha.com
+        -> CloudFront (Main_interface dist + frontend dist as S3 origins, cache static)
+        -> ALB (public) -> Target Groups -> ECS Fargate (gateway 8080, auth 3001 ... trainer 3015)
+        -> RDS PostgreSQL 16 (db.nutrivedha, migrations 001-004, pgcrypto)
+        -> Secrets Manager (.env), ECR (docker images), CloudWatch Logs, S3 (usda assets, uploads)
+```
+
+**Steps:**
+1. **Build images:** `docker compose build` (gateway + 13 services use `backend/services/*/Dockerfile` `node:22-alpine`). Push to **ECR**: `aws ecr create-repository` + `docker tag/push` per service.
+2. **RDS:** Launch `Postgres 16` (db.t3.micro start), security group allows ECS tasks only. Run migrations: `psql $DATABASE_URL -f database/migrations/001_init_postgresql.sql` through `...004_...`. Store `DATABASE_URL` in Secrets Manager.
+3. **ECS Fargate:** One **Task Definition per service** (256 CPU / 512 MB, env from Secrets Manager, `HEALTHCHECK /health`, port 3001..3015 + 8080). Service = 1 desired task, auto-scale on CPU 60%. Gateway task has `port 8080` public via ALB.
+4. **ALB:** Listener `443` (ACM cert for `api.nutrivedha.com`) -> forward `/api/*` to gateway target group `8080`. Path rule `/api/auth -> 3001` etc. is inside gateway; ALB only needs gateway. Internal ALB for inter-service if you split VPC.
+5. **Networking:** VPC with 2 AZs, public subnets (ALB + NAT), private subnets (ECS + RDS). Security groups: ALB 80/443 open, ECS 8080/3001-3015 from ALB only, RDS 5432 from ECS only.
+6. **Frontends on S3+CloudFront (alternative to Vercel on AWS):** `Main_interface/dist` -> S3 `nutrivedha-main-interface`, `frontend/dist` -> S3 `nutrivedha-frontend`; CloudFront distributions with `api.nutrivedha.com` as custom origin for `/api`. Invalidation on deploy.
+7. **CI/CD:** GitHub Actions -> `npm run build` (frontend + Main_interface + backend), `docker build/push ECR`, `aws ecs update-service --force-new-deployment`, `aws s3 sync dist s3://... --delete` + `cloudfront create-invalidation`.
+8. **Env:** All `VITE_*` that are backend secrets (JWT, encryption, Razorpay, Mapbox) go to Secrets Manager / ECS task env, not into the frontend build. Only `VITE_API_BASE_URL` is baked into the frontend.
+9. **Cost starter:** Fargate Spot, RDS t3.micro, ALB LCU minimal — ~$35–60/mo for dev; scale to single gateway+auth task for cheap demo.
+
+### Which env where
+| Where | Env example | Example value |
+|---|---|---|
+| Vercel `Main_interface` | `VITE_API_BASE_URL` | `https://api.nutrivedha.com/api` |
+| Vercel `frontend` | `VITE_API_BASE_URL`, `VITE_GEMINI_API_KEY` | same gateway URL |
+| AWS ECS / Secrets Manager | `DATABASE_URL`, `VITE_AUTH_JWT_SECRET`, `VITE_MEDICAL_ENCRYPTION_KEY`, `PGPASSWORD` | never on Vercel frontend |
+| AWS RDS | `PGDATABASE=nutrivedha`, `PGUSER`, `PGPASSWORD` | managed |
+
+See also: `Main_interface/README.md`, `frontend/README.md`, `backend/README.md`, `docker-compose.yml`, `.env.example` for per-folder details.
+
+---
+
 **© 2026 NutriVedha Systems — Precision in every grain.**
+
+---
+
+## 14C. Frontend Merge & Deduplication — Detailed Changes (2026-09)
+
+### 15.0 Summary — Single-Command Frontend (Microservices Preserved)
+
+**Goal:** `Main_interface/` (public 7 pages) + `frontend/` (6 role apps Parts 1-6) previously required **two** `npm run dev` on `:5173` and `:5174`. Now **one** `cd frontend && npm run dev` on `:5173` serves **all** via `gateway :8080`.
+
+**Microservices format kept:** `frontend/src/services/*.ts` 14 isolated clients `client.ts:8` `API_BASE gateway Bearer` `hooks/useApi.ts` per-service, no cross-service writes. Public pages are static, auth via `auth.service` -> `gateway` same as role apps.
+
+### 15.1 What Was Merged
+
+| Source `Main_interface/src/*` | Destination `frontend/src/*` | Notes |
+|---|---|---|
+| `pages/Home.tsx` + `Home.css` | `pages/main/Home.tsx` + `Home.css` | Fix `import {Reveal} from '../../components/main/Reveal'` |
+| `pages/About.tsx|.css` `Services.tsx|.css` `Developers.tsx|.css` `Contact.tsx|.css` | `pages/main/About|Services|Developers|Contact` | Same fix |
+| `pages/Signup.tsx` + `Auth.css` | `pages/main/Signup.tsx` + `Auth.css` | Fix `from '../../services/auth.service'` -> `../../services/auth.service` |
+| `components/PublicLayout.tsx` | `components/main/PublicLayout.tsx` | `Outlet` + `PublicNavbar` + `Footer` |
+| `components/PublicNavbar.tsx|.css` | `components/main/PublicNavbar.tsx|.css` | |
+| `components/Footer.tsx|.css` | `components/main/Footer.tsx|.css` | |
+| `components/Reveal.tsx` | `components/main/Reveal.tsx` | |
+| `components/AuthGate.tsx` | `components/main/AuthGate.tsx` | Fix `from '../../services/client'` |
+| `src/index.css` | `styles/main-public.css` | Imported in `App.tsx:10` |
+| `public/logo.jpeg` `hero.png` `hero-visual.jpeg` `favicon.jpeg` | `frontend/public/` `public/images/*` | `doctor-bg.png` etc created from `hero.png` |
+
+### 15.2 `frontend/src/App.tsx` — Merged Router
+
+**Before:** `<Layout><Routes> <Route path="/" element={<Home/>}>` (old `pages/Home.tsx`) + `23 routes` + `PrivateRoute` 6 roles.
+
+**After:** `App.tsx:1`
+```tsx
+import PublicLayout from './components/main/PublicLayout';
+import MainHome from './pages/main/Home'; // Main_interface Home (ecosystem, 287 lines)
+import About/Services/Developers/Contact/Signup from './pages/main/*';
+import './styles/main-public.css';
+...
+<Routes>
+  <Route element={<PublicLayout />}> // no auth, static
+    <Route path="/" element={<MainHome/>}/>
+    <Route path="/about" element={<About/>}/>
+    <Route path="/services" element={<Services/>}/>
+    <Route path="/developers" element={<Developers/>}/>
+    <Route path="/contact" element={<Contact/>}/>
+    <Route path="/signup" element={<Signup/>}/>
+  </Route>
+  <Route path="/login" element={<Login/>}/> // microservices auth.service
+  <Route path="/scan" element={<Layout><Scan/></Layout>}/> // etc 14 generic
+  <Route element={<PrivateRoute roles=['Doctor']}><DoctorLayout/></PrivateRoute>}> // 9
+  <Route element={<PrivateRoute roles=['Trainer']}><TrainerLayout/></PrivateRoute>}> // 10
+  // ... Farmer 9, Delivery 7, Admin 12, User 11
+</Routes>
+```
+- Public: `MainHome` replaces old `pages/Home.tsx` (old kept as `/home-legacy` removed, now `MainHome` is `/`).
+- Auth: `Login` kept (`frontend/src/pages/Login.tsx` role-aware, not `Main_interface` simple), `Signup` added as new public route.
+
+### 15.3 `frontend/vite.config.ts:8` — Gateway Proxy (Microservices)
+
+```ts
+server:{port:5173, proxy:{'/api':{target:'http://localhost:8080', changeOrigin:true,
+  configure: proxy=>proxy.on('proxyReq',(req)=>{ const c=req.headers.cookie; if(c) proxyReq.setHeader('cookie',c) })}}}
+build:{chunkSizeWarningLimit:1000, rollupOptions:{output:{manualChunks:{vendor:['react','react-dom','react-router-dom'],icons:['lucide-react'],store:['zustand']}}}}
+```
+All 14 `services/*.ts` stay `apiGet('/doctor/...')` etc.
+
+### 15.4 Duplicate Logic Removed
+
+| Duplicate Group | Files Before | After | How |
+|---|---|---|---|
+| **Exact copies** `Main_interface` vs `frontend/pages/main` | 22 pairs `Home x3` `AuthGate` `Footer` `client.ts` | `Main_interface/` **deleted** `141 MB` | Verified `Select-String frontend -Pattern Main_interface` 0 hits, `frontend npm run build` 0 duplicate `Group Name>1` |
+| **Legacy vs New** `pages/AdminDashboard.tsx` vs `pages/admin/AdminDashboard.tsx` + 11 others `Home|Doctor*|Farmer*|Trainer*|Delivery*` | `App.tsx` imported both `*Legacy` + `*New` | Removed `*Legacy` imports+routes + deleted 11 `pages/*.tsx` + 9 orphans `Home|Doctor*` -> `App.tsx` now only `pages/<role>/*` + `pages/main/*` |
+| **Layouts 7x** `DoctorLayout:23` `TrainerLayout:28` ... `UserLayout:28` `~90%` `useState collapsed/mobileOpen + <Sidebar><Outlet>` | 7 files `23-28` lines each | Created `components/RoleLayout.tsx:1` + `RoleSidebar.tsx:1` generic `NAV+theme+roleNote`, refactored 6 `*Layout.tsx` to 5-line wrappers `export const DoctorLayout=()=><RoleLayout nav={NAV} theme="doctor"/>` (kept `*Sidebar.css` for theming). Deleted 6 `*Sidebar.tsx` (53 lines each). `1875 vs 1897 modules` -22 |
+| **Styles 6x** `doctor|trainer|farmer|delivery|admin|user.css` `96-115` lines `hero|card|badge|table|stagger` | 6 files kept for `var(--*-primary)` theming (not deleted, base could be extracted to `role-base.css` next) |
+| **Functions** `showToast 2500ms` x18, `filtered=rows.filter(q)` x12, `confirm modal` x6 | Repeated in `AdminDoctors|Marketplace|...` | Created `hooks/useToast.ts:1` `useConfirmAction.ts` `useFilteredList.ts` — new pages use, old to migrate incrementally |
+
+**Verification:** `Get-ChildItem src -Recurse | Group Name | Count>1` = **0** after cleanup (was 22). `npm run build` `1875 modules` `✓ 8-23s` (was 1897, -22). `npm run lint` `0 errors` (was 4 errors `purity`).
+
+### 15.5 Single-Command Execution
+
+```powershell
+cd NutriVedha/frontend
+npm install # 1st time
+npm run dev # http://localhost:5173 — Main "/" + all 6 parts, proxy /api->:8080
+# With backend: cd backend; npm run dev:all # gateway :8080 + 14 services
+```
+
+`Main_interface` folder removed — no second `npm run dev --prefix Main_interface` needed.
 
 ---
 

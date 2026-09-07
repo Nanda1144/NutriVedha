@@ -1,0 +1,20 @@
+[
+  {
+    "orderId": "ORD-101",
+    "customer": "Pavan Kumar",
+    "address": "123 Neural Lane, BLR",
+    "status": "Pending",
+    "items": "Ashwagandha Roots, Organic Honey",
+    "id": "441a2a5a-a976-4ea5-929d-49fdadb8dd55",
+    "createdAt": "2026-09-07T14:32:19.191Z"
+  },
+  {
+    "orderId": "ORD-102",
+    "customer": "Anjali Sharma",
+    "address": "456 Wellness Rd, BLR",
+    "status": "In Transit",
+    "items": "Tulsi Tea, Neem Tablets",
+    "id": "dc45dd99-ae5c-49dd-bd38-1bcccf1448a6",
+    "createdAt": "2026-09-07T14:32:19.197Z"
+  }
+]

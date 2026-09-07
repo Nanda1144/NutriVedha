@@ -1,0 +1,21 @@
+.services-hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fdfcf8 0%,#fff 55%,#f6f3ea 100%);border-bottom:1px solid #ece9e0}
+.services-hero h1{margin:14px 0 12px;max-width:680px;font-weight:900}
+.services-hero__lead{max-width:640px;color:var(--text-muted);font-size:1.06rem;font-weight:600}
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.svc-card{background:#fff;border:1.5px solid #e6ebe2;border-radius:2px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 4px 16px rgba(15,30,15,0.04)}
+.svc-card__top{display:flex;align-items:center;justify-content:space-between}
+.svc-card__group{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:900;color:var(--primary);background:var(--accent-soft);padding:5px 8px;border-radius:2px;border:1px solid rgba(167,201,87,0.2)}
+.svc-card__icon{width:40px;height:40px;display:grid;place-items:center;border-radius:2px;background:linear-gradient(135deg,#f6f3ea,#eef6df);color:var(--primary);border:1px solid rgba(167,201,87,0.18)}
+.svc-card h3{font-size:1.06rem;font-weight:900}
+.svc-card p{color:var(--text-muted);font-size:0.88rem;flex:1;font-weight:600}
+.svc-card__workflow{background:#fdfcf8;border:1px solid #ece9e2;border-radius:2px;padding:12px}
+.svc-card__workflow-label{font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:900;color:var(--primary)}
+.svc-card__workflow ul{display:grid;gap:6px;margin-top:8px}
+.svc-card__workflow li{display:inline-flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--text-main);font-weight:700}
+.svc-card__workflow li svg{color:var(--success);flex-shrink:0;stroke-width:2.4}
+.svc-card__cta{margin-top:4px;display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:0.86rem;color:var(--primary)}
+.svc-card__cta:hover{color:var(--primary-dark);transform:translateX(3px)}
+.svc-note{margin-top:20px;background:#fff;border:1.5px dashed #d6d8d1;border-radius:2px;padding:14px 16px;font-size:0.88rem;color:var(--text-muted);font-weight:600}
+.svc-note strong{color:var(--primary-dark);font-weight:900}
+@media(max-width:1100px){.svc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.svc-grid{grid-template-columns:1fr}}

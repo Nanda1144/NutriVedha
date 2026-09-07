@@ -50,17 +50,17 @@ router.use(requireAuth(config.jwtSecret));
 
 // GET /api/user/profile
 router.get('/profile', (req: Request, res: Response) => {
-  let p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  let p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) {
     p = {
       id: Profiles.newId(),
-      userId: req.user!.userId,
-      email: req.user!.email,
-      name: req.user!.email.split('@')[0],
+      userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId!,
+      email: ((req.user as any).email || "unknown@nutrivedha.local"),
+      name: ((req.user as any).email || "unknown@nutrivedha.local").split('@')[0],
       phone: '',
       address: '',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${req.user!.userId}`,
-      role: req.user!.role,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${(req.user as any).id || (req.user as any).id || (req.user as any).userId!}`,
+      role: (req.user as any).role,
       age: 0,
       dob: '',
       weight: 0,
@@ -81,17 +81,17 @@ router.get('/profile', (req: Request, res: Response) => {
 
 // PUT /api/user/profile
 router.put('/profile', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) return fail(res, 'Profile not found', 404);
-  const patch = req.body as Partial<UserProfile>;
-  const updated = Profiles.update(p.id, { ...patch, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
-  audit(req.user!.userId, 'You (User)', req.user!.role, 'Updated personal profile details');
+  const { role: _ignored, ...safePatch } = req.body as any;
+  const updated = Profiles.update(p.id, { ...safePatch, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'You (User)', (req.user as any).role, 'Updated personal profile details');
   ok(res, { profile: updated });
 });
 
 // PUT /api/user/rbac
 router.put('/rbac', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) return fail(res, 'Profile not found', 404);
   const merged = { ...p.rbac, ...req.body };
   Profiles.update(p.id, { rbac: merged, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
@@ -100,28 +100,28 @@ router.put('/rbac', (req: Request, res: Response) => {
 
 // PUT /api/user/security
 router.put('/security', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) return fail(res, 'Profile not found', 404);
   const merged = { ...p.security, ...req.body };
   Profiles.update(p.id, { security: merged, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
-  audit(req.user!.userId, 'You (User)', req.user!.role, 'Updated security settings');
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'You (User)', (req.user as any).role, 'Updated security settings');
   ok(res, { security: merged });
 });
 
 // PUT /api/user/backup - simulate cloud backup (updates lastBackup)
 router.put('/backup', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) return fail(res, 'Profile not found', 404);
   const security = { ...p.security, lastBackup: new Date().toISOString() };
   Profiles.update(p.id, { security, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
-  audit(req.user!.userId, 'You (User)', req.user!.role, 'Initiated cloud data backup');
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'You (User)', (req.user as any).role, 'Initiated cloud data backup');
   ok(res, { security, message: 'Backup synced' });
 });
 
 // GET /api/user/export - full data dump (encrypted PII, plaintext for dev)
 router.get('/export', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
-  const logs = AuditLogs.find({ userId: req.user!.userId } as Partial<AuditLog>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
+  const logs = AuditLogs.find({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<AuditLog>);
   const encryptPii = config.env === 'production';
   const data = {
     exportedAt: new Date().toISOString(),
@@ -129,30 +129,30 @@ router.get('/export', (req: Request, res: Response) => {
     auditLogs: logs,
     note: 'Full data portability export. PII encrypted at rest in production.',
   };
-  audit(req.user!.userId, 'You (User)', req.user!.role, 'Generated data export');
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'You (User)', (req.user as any).role, 'Generated data export');
   res.setHeader('Content-Disposition', 'attachment; filename="ayurai-vault.json"');
   ok(res, data);
 });
 
 // POST /api/user/delete - schedule deletion with 30-day grace
 router.post('/delete', (req: Request, res: Response) => {
-  const p = Profiles.findOne({ userId: req.user!.userId } as Partial<UserProfile>);
+  const p = Profiles.findOne({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<UserProfile>);
   if (!p) return fail(res, 'Profile not found', 404);
   const deletionScheduledAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
   Profiles.update(p.id, { deletionScheduledAt, updatedAt: new Date().toISOString() } as Partial<UserProfile>);
-  audit(req.user!.userId, 'System', 'AI', 'Scheduled Account Deletion (30-day Grace Period)');
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'System', 'AI', 'Scheduled Account Deletion (30-day Grace Period)');
   ok(res, { deletionScheduledAt, message: 'Deletion scheduled. 30-day grace period to cancel.' });
 });
 
 // GET /api/user/audit - user's audit trail
 router.get('/audit', (req: Request, res: Response) => {
-  const logs = AuditLogs.find({ userId: req.user!.userId } as Partial<AuditLog>);
+  const logs = AuditLogs.find({ userId: (req.user as any).id || (req.user as any).id || (req.user as any).userId! } as Partial<AuditLog>);
   ok(res, { logs });
 });
 
 // POST /api/user/change-passkey (placeholder passthrough to auth service)
 router.post('/change-passkey', (req: Request, res: Response) => {
-  audit(req.user!.userId, 'You (User)', req.user!.role, 'Updated passkey (security update)');
+  audit((req.user as any).id || (req.user as any).id || (req.user as any).userId!, 'You (User)', (req.user as any).role, 'Updated passkey (security update)');
   ok(res, { message: 'Passkey update requested' });
 });
 

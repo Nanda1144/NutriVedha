@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import type { Request, Response, NextFunction } from 'express';
 import type { ServiceConfig } from './config.js';
 
@@ -15,13 +16,14 @@ export function createService(config: ServiceConfig, mountPrefix: string, regist
 
   app.use(helmet());
   app.use(cors({ origin: config.corsOrigin, credentials: true }));
+  app.use(cookieParser());
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
 
   app.use(
     rateLimit({
-      windowMs: parseInt(process.env.VITE_RATE_LIMIT_WINDOW_MS || '900000', 10),
-      max: parseInt(process.env.VITE_RATE_LIMIT_MAX_REQUESTS || '100', 10),
+      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || process.env.VITE_RATE_LIMIT_WINDOW_MS || '900000', 10),
+      max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || process.env.VITE_RATE_LIMIT_MAX_REQUESTS || '100', 10),
       standardHeaders: true,
       legacyHeaders: false,
     })

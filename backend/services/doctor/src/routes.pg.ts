@@ -37,7 +37,7 @@ router.use(requireRole('Doctor', 'Admin'));
 
 // GET /api/doctor/profile
 router.get('/profile', async (req: Request, res: Response) => {
-  const userId = req.user!.userId;
+  const userId = (req.user as any).id || (req.user as any).userId!;
   if (await usePg()) {
     try {
       const { rows } = await pgQuery<DoctorProfile & { user_id: string; reg_number: string }>(
@@ -58,7 +58,7 @@ router.get('/profile', async (req: Request, res: Response) => {
 
 // POST /api/doctor/profile
 router.post('/profile', async (req: Request, res: Response) => {
-  const userId = req.user!.userId;
+  const userId = (req.user as any).id || (req.user as any).userId!;
   const { name, specialization, regNumber, experience } = req.body ?? {};
   if (!name || !regNumber) return fail(res, 'name and regNumber required');
   if (await usePg()) {
@@ -115,7 +115,7 @@ router.post('/verify/:id', requireRole('Admin'), async (req: Request, res: Respo
 
 // GET /api/doctor/patients
 router.get('/patients', async (req: Request, res: Response) => {
-  const userId = req.user!.userId;
+  const userId = (req.user as any).id || (req.user as any).userId!;
   if (await usePg()) {
     try {
       const prof = await pgQuery(`SELECT id FROM doctor_profiles WHERE user_id = $1`, [userId]);

@@ -29,6 +29,7 @@ export interface ServiceConfig {
   env: 'development' | 'test' | 'production';
   jwtSecret: string;
   jwtExpiry: string;
+  jwtRefreshExpiry: string;
   medicalEncryptionKey: string;
   corsOrigin: string;
   pg: PgConfig;
@@ -54,10 +55,11 @@ export function getConfig(name: string, defaultPort: number): ServiceConfig {
     port: parseInt(process.env[`VITE_${name.toUpperCase()}_SERVICE_URL`]
       ?.match(/:(\d+)/)?.[1] ?? '', 10) || defaultPort,
     env: (process.env.VITE_APP_ENV as ServiceConfig['env']) || 'development',
-    jwtSecret: process.env.VITE_AUTH_JWT_SECRET || 'dev-secret-change-me',
-    jwtExpiry: process.env.VITE_AUTH_JWT_EXPIRY || '7d',
-    medicalEncryptionKey: process.env.VITE_MEDICAL_ENCRYPTION_KEY || 'dev-encryption-key-32chars!!',
-    corsOrigin: process.env.VITE_CORS_ORIGIN || 'http://localhost:5173',
+    jwtSecret: process.env.AUTH_JWT_SECRET || process.env.JWT_ACCESS_SECRET || process.env.VITE_AUTH_JWT_SECRET || 'dev-secret-change-me',
+    jwtExpiry: process.env.AUTH_JWT_EXPIRY || process.env.JWT_ACCESS_EXPIRES_IN || process.env.VITE_AUTH_JWT_EXPIRY || '15m',
+    jwtRefreshExpiry: process.env.AUTH_REFRESH_TOKEN_EXPIRY || process.env.JWT_REFRESH_EXPIRES_IN || process.env.VITE_AUTH_REFRESH_TOKEN_EXPIRY || '30d',
+    medicalEncryptionKey: process.env.MEDICAL_ENCRYPTION_KEY || process.env.VITE_MEDICAL_ENCRYPTION_KEY || 'dev-encryption-key-32chars!!',
+    corsOrigin: process.env.CORS_ORIGIN || process.env.FRONTEND_URL || process.env.VITE_CORS_ORIGIN || 'http://localhost:5173',
     pg: getPgConfig(),
   };
 }
